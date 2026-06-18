@@ -1,6 +1,7 @@
 // Firebase Configuration Service
 // This service will be used to initialize Firebase and provide access to Firebase services
 
+import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -41,7 +42,6 @@ class FirebaseService {
         alert: true,
         announcement: false,
         badge: true,
-        carryForwardNotificationSettings: true,
         provisional: false,
         sound: true,
       );
