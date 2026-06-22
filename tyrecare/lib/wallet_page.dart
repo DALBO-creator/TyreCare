@@ -3,36 +3,16 @@ import 'package:flutter/material.dart';
 
 class WalletPage extends StatelessWidget {
   final double saldoAttuale;
+  final List<Map<String, dynamic>> transazioni;
 
-  const WalletPage({super.key, required this.saldoAttuale});
+  const WalletPage({
+    super.key, 
+    required this.saldoAttuale, 
+    required this.transazioni,
+  });
 
   @override
   Widget build(BuildContext context) {
-    // Storico transazioni reale e pulito
-    final List<Map<String, dynamic>> transazioni = [
-      {
-        'titolo': 'Cambio gomme stagionale',
-        'officina': 'PneusHub Travagliato',
-        'data': '14 Maggio 2026',
-        'importo': '+€ 15.00',
-        'tipo': 'guadagno'
-      },
-      {
-        'titolo': 'Controllo sicurezza & Bilanciatura',
-        'officina': 'Master Driver Brescia Ovest',
-        'data': '22 Aprile 2026',
-        'importo': '+€ 8.50',
-        'tipo': 'guadagno'
-      },
-      {
-        'titolo': 'Riscatto Buono Sconto',
-        'officina': 'Garage iperGomme Castegnato',
-        'data': '10 Marzo 2026',
-        'importo': '-€ 20.00',
-        'tipo': 'speso'
-      },
-    ];
-
     return Scaffold(
       backgroundColor: const Color(0xFF1E1E1E),
       appBar: AppBar(
@@ -107,43 +87,45 @@ class WalletPage extends StatelessWidget {
 
             // LISTA MOVIMENTI COMPLETAMENTE ALLINEATA AL LOOK DEL MOCKUP
             Expanded(
-              child: ListView.builder(
-                itemCount: transazioni.length,
-                itemBuilder: (context, index) {
-                  final t = transazioni[index];
-                  final isGuadagno = t['tipo'] == 'guadagno';
+              child: transazioni.isEmpty 
+                ? const Center(child: Text('Nessuna attività recente', style: TextStyle(color: Colors.grey)))
+                : ListView.builder(
+                    itemCount: transazioni.length,
+                    itemBuilder: (context, index) {
+                      final t = transazioni[index];
+                      final isGuadagno = t['tipo'] == 'guadagno';
 
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF252525),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                      title: Text(
-                        t['titolo'] as String,
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                      ),
-                      subtitle: Padding(
-                        padding: const EdgeInsets.only(top: 4.0),
-                        child: Text(
-                          '${t['officina']} • ${t['data']}',
-                          style: const TextStyle(color: Colors.grey, fontSize: 12),
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF252525),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      ),
-                      trailing: Text(
-                        t['importo'] as String,
-                        style: TextStyle(
-                          color: isGuadagno ? Colors.greenAccent : Colors.grey,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                          title: Text(
+                            t['titolo'] as String,
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                          ),
+                          subtitle: Padding(
+                            padding: const EdgeInsets.only(top: 4.0),
+                            child: Text(
+                              '${t['officina']} • ${t['data']}',
+                              style: const TextStyle(color: Colors.grey, fontSize: 12),
+                            ),
+                          ),
+                          trailing: Text(
+                            t['importo'] as String,
+                            style: TextStyle(
+                              color: isGuadagno ? Colors.greenAccent : Colors.grey,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  );
-                },
-              ),
+                      );
+                    },
+                  ),
             ),
           ],
         ),

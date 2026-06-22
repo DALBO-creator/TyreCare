@@ -1,5 +1,6 @@
 // lib/home_page.dart
 import 'package:flutter/material.dart';
+import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'models.dart';
 import 'detail_page.dart';
 
@@ -8,7 +9,9 @@ class HomePage extends StatelessWidget {
   final double kmSlider;
   final Function(double) onKmVariati;
   final List<String> listaNomiVeicoli;
+  final List<Map<String, dynamic>> transazioni;
   final Function(String) onAutoCambiata;
+  final Function(int) onTabCambiato;
 
   const HomePage({
     super.key,
@@ -16,7 +19,9 @@ class HomePage extends StatelessWidget {
     required this.kmSlider,
     required this.onKmVariati,
     required this.listaNomiVeicoli,
+    required this.transazioni,
     required this.onAutoCambiata,
+    required this.onTabCambiato,
   });
 
   @override
@@ -73,159 +78,173 @@ class HomePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 1. MODELLO 3D AUTO IN PROSPETTIVA (USA EXPANDED PER ADATTARSI)
-              Expanded(
+              // 1. MODELLO 3D AUTO IN PROSPETTIVA (Contenitore ridotto, Zoom aumentato)
+              SizedBox(
+                height: 170,
                 child: Stack(
-                  alignment: Alignment.center,
                   children: [
-                    Opacity(
-                      opacity: 0.9,
-                      child: Image.network(
-                        'https://images.pngimages.com/download/0b18f8e0d6da7e923e1e9a26372bf9dc.png', 
-                        fit: BoxFit.contain,
-                      ),
+                    ModelViewer(
+                      backgroundColor: const Color(0xFF1E1E1E),
+                      src: 'assets/bmw_m4csl-v1.glb',
+                      alt: "Test Modello 3D",
+                      autoRotate: true,
+                      cameraControls: true,
+                      disableZoom: true,
+                      autoPlay: true,
+                      ar: false,
+                      loading: Loading.eager,
+                      cameraOrbit: "0deg 75deg 65%", // Inclinazione più alta (75°) e più lontana (65%) per non tagliare il muso
+                      minCameraOrbit: "auto 75deg auto", 
+                      maxCameraOrbit: "auto 75deg auto", 
+                      fieldOfView: "22deg",          // Campo visivo leggermente più ampio
+                      interpolationDecay: 400,
                     ),
+                    // ICONA 360°
                     Positioned(
-                      bottom: 0,
+                      bottom: 8,
                       right: 8,
                       child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.4),
-                        borderRadius: BorderRadius.circular(12),
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.4),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.threed_rotation,
+                          color: Colors.white70,
+                          size: 18,
+                        ),
                       ),
-                      child: const Row(
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8), // Ridotto da 12 a 8
+
+              // 2. SLIDER DEI CHILOMETRI INTEGRATO CON CURA
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF252525),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(Icons.threed_rotation, color: Colors.grey, size: 12),
-                          SizedBox(width: 4),
-                          Text('360°', style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
+                          const Text('Simulazione chilometri:', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                          Text('${kmSlider.toInt()} km', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                         ],
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // 2. SLIDER DEI CHILOMETRI INTEGRATO CON CURA
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: const Color(0xFF252525),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Simulazione chilometri:', style: TextStyle(color: Colors.grey, fontSize: 11)),
-                        Text('${kmSlider.toInt()} km', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
-                      ],
+                    Expanded(
+                      flex: 2,
+                      child: Slider(
+                        value: kmSlider,
+                        min: 0,
+                        max: 15000,
+                        divisions: 150,
+                        activeColor: Colors.redAccent,
+                        inactiveColor: Colors.grey[800],
+                        onChanged: (newValue) => onKmVariati(newValue),
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Slider(
-                      value: kmSlider,
-                      min: 0,
-                      max: 15000,
-                      divisions: 150,
-                      activeColor: Colors.redAccent,
-                      inactiveColor: Colors.grey[800],
-                      onChanged: (newValue) => onKmVariati(newValue),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
+              const SizedBox(height: 8), // Ridotto da 12 a 8
 
             // 3. STATO GENERALE PNEUMATICI (MOCKUP STILE ANTEPRIMA)
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12), // Ridotto padding interno da 16 a 12
               decoration: BoxDecoration(
                 color: const Color(0xFF252525),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Stato generale pneumatici', style: TextStyle(color: Colors.grey, fontSize: 13)),
-                      const SizedBox(height: 6),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        textBaseline: TextBaseline.alphabetic,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('$mediaUsura', style: const TextStyle(fontSize: 38, fontWeight: FontWeight.bold, color: Colors.white)),
-                          const Text('%', style: TextStyle(fontSize: 20, color: Colors.white)),
+                          const Text('Stato generale pneumatici', style: TextStyle(color: Colors.grey, fontSize: 13)),
+                          const SizedBox(height: 4), // Ridotto da 6 a 4
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.baseline,
+                            textBaseline: TextBaseline.alphabetic,
+                            children: [
+                              Text('$mediaUsura', style: const TextStyle(fontSize: 34, fontWeight: FontWeight.bold, color: Colors.white)), // Ridotto font da 38 a 34
+                              const Text('%', style: TextStyle(fontSize: 18, color: Colors.white)),
+                            ],
+                          ),
+                          const SizedBox(height: 2), // Ridotto da 4 a 2
+                          Text(
+                            mediaUsura > 70 ? 'Ottimo stato' : (mediaUsura > 50 ? 'Stato medio' : 'Urgente controllo'), 
+                            style: TextStyle(color: coloreStatoGenerale, fontWeight: FontWeight.bold, fontSize: 13) // Ridotto font da 14 a 13
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        mediaUsura > 70 ? 'Ottimo stato' : (mediaUsura > 50 ? 'Stato medio' : 'Urgente controllo'), 
-                        style: TextStyle(color: coloreStatoGenerale, fontWeight: FontWeight.bold, fontSize: 14)
+                      // Grafico ad anello circolare nativo
+                      SizedBox(
+                        width: 65, // Ridotto da 75 a 65
+                        height: 65,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            CircularProgressIndicator(
+                              value: 1.0, 
+                              strokeWidth: 7, // Ridotto da 8 a 7
+                              valueColor: const AlwaysStoppedAnimation<Color>(Colors.redAccent),
+                            ),
+                            CircularProgressIndicator(
+                              value: mediaUsura / 100,
+                              strokeWidth: 7, // Ridotto da 8 a 7
+                              backgroundColor: Colors.transparent,
+                              valueColor: AlwaysStoppedAnimation<Color>(coloreStatoGenerale),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10.0), // Ridotto da 12 a 10
+                    child: Divider(color: Color(0xFF333333), height: 1),
+                  ),
+                  // INFO CONTROLLI INTEGRATE NELLA CARD
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Ultimo controllo', style: TextStyle(color: Colors.grey, fontSize: 10)), // Ridotto da 11 a 10
+                          const SizedBox(height: 2), // Ridotto da 4 a 2
+                          const Text('12 Marzo 2024', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500)), // Ridotto da 13 a 12
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Prossimo controllo', style: TextStyle(color: Colors.grey, fontSize: 10)),
+                          const SizedBox(height: 2),
+                          const Text('tra 1.200 km', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500)),
+                        ],
                       ),
                     ],
                   ),
-                  // Grafico ad anello circolare nativo
-                  SizedBox(
-                    width: 75,
-                    height: 75,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        CircularProgressIndicator(
-                          value: 1.0, // Rosso come base per far vedere che non è pieno
-                          strokeWidth: 8,
-                          valueColor: const AlwaysStoppedAnimation<Color>(Colors.redAccent),
-                        ),
-                        CircularProgressIndicator(
-                          value: mediaUsura / 100,
-                          strokeWidth: 8,
-                          backgroundColor: Colors.transparent,
-                          valueColor: AlwaysStoppedAnimation<Color>(coloreStatoGenerale),
-                        ),
-                      ],
-                    ),
-                  )
                 ],
               ),
             ),
-            const SizedBox(height: 16),
-            
-            // INFO CONTROLLI (Sotto la card stato generale)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Ultimo controllo', style: TextStyle(color: Colors.grey, fontSize: 12)),
-                    const SizedBox(height: 4),
-                    const Text('12 Marzo 2024', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500)),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Prossimo controllo', style: TextStyle(color: Colors.grey, fontSize: 12)),
-                    const SizedBox(height: 4),
-                    const Text('tra 1.200 km', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500)),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 12), // Ridotto da 16 a 12
 
             // 4. PLANCIA TOP-DOWN DIAGNOSTICA CON LED E CARD RETTANGOLARI
             Expanded(
-              flex: 3,
+              flex: 4, // Aumentato leggermente il flex per dare respiro alle card
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                 decoration: BoxDecoration(
@@ -245,25 +264,25 @@ class HomePage extends StatelessWidget {
                         ],
                       ),
                     ),
-                    // Chassis centrale + Neon
+                    // Chassis centrale con immagine auto + bagliore gomme
                     Expanded(
                       flex: 3,
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          Container(
-                            width: 45,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF1E1E1E),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.grey[800]!, width: 1.5),
+                          // IMMAGINE AUTO TOP-DOWN
+                          Opacity(
+                            opacity: 0.8,
+                            child: Image.asset(
+                              'assets/autoHomePage.png',
+                              fit: BoxFit.contain,
                             ),
                           ),
-                          _buildNeon(top: 8, left: 2, usura: uAntSx),
-                          _buildNeon(top: 8, right: 2, usura: uAntDx),
-                          _buildNeon(bottom: 8, left: 2, usura: uPostSx),
-                          _buildNeon(bottom: 8, right: 2, usura: uPostDx),
+                          // BAGLIORI GOMME DINAMICI
+                          _buildGlowTire(top: 22, left: 6, usura: uAntSx),
+                          _buildGlowTire(top: 22, right: 6, usura: uAntDx),
+                          _buildGlowTire(bottom: 22, left: 6, usura: uPostSx),
+                          _buildGlowTire(bottom: 22, right: 6, usura: uPostDx),
                         ],
                       ),
                     ),
@@ -286,7 +305,7 @@ class HomePage extends StatelessWidget {
 
             // POLISHED ACTION BUTTON RED
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () => onTabCambiato(2),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFC62828),
                 padding: const EdgeInsets.symmetric(vertical: 14),
@@ -306,7 +325,7 @@ class HomePage extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => DetailPage(veicolo: veicolo, posizioneIniziale: pos, kmSlider: kmSlider)),
+          MaterialPageRoute(builder: (context) => DetailPage(veicolo: veicolo, posizioneIniziale: pos, kmSlider: kmSlider, transazioni: transazioni)),
         );
       },
       child: Container(
@@ -334,17 +353,23 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildNeon({double? top, double? bottom, double? left, double? right, required int usura}) {
+  Widget _buildGlowTire({double? top, double? bottom, double? left, double? right, required int usura}) {
     Color c = usura > 70 ? Colors.greenAccent : (usura > 50 ? Colors.orangeAccent : Colors.redAccent);
     return Positioned(
       top: top, bottom: bottom, left: left, right: right,
       child: Container(
-        width: 4,
-        height: 16,
+        width: 12,
+        height: 20,
         decoration: BoxDecoration(
-          color: c,
-          borderRadius: BorderRadius.circular(1),
-          boxShadow: [BoxShadow(color: c.withOpacity(0.6), blurRadius: 6, spreadRadius: 1)],
+          color: c.withOpacity(0.4),
+          borderRadius: BorderRadius.circular(4),
+          boxShadow: [
+            BoxShadow(
+              color: c.withOpacity(0.8),
+              blurRadius: 10,
+              spreadRadius: 2,
+            )
+          ],
         ),
       ),
     );

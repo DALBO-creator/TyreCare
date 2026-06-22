@@ -33,10 +33,32 @@ class MainContainer extends StatefulWidget {
 
 class _MainContainerState extends State<MainContainer> {
   int _indiceSelezionato = 0;
-  final double _cashbackGlobale = 150.00; 
-
-  // LA NOSTRA VARIABILE STATO DELLO SLIDER ADESSO È QUI!
+  double _cashbackGlobale = 150.00; 
   double _kmSimulatiDalloSlider = 0.0;
+
+  final List<Map<String, dynamic>> _transazioniWallet = [
+    {
+      'titolo': 'Cambio gomme stagionale',
+      'officina': 'PneusHub Travagliato',
+      'data': '14 Maggio 2026',
+      'importo': '+€ 15.00',
+      'tipo': 'guadagno'
+    },
+    {
+      'titolo': 'Controllo sicurezza & Bilanciatura',
+      'officina': 'Master Driver Brescia Ovest',
+      'data': '22 Aprile 2026',
+      'importo': '+€ 8.50',
+      'tipo': 'guadagno'
+    },
+    {
+      'titolo': 'Riscatto Buono Sconto',
+      'officina': 'Garage iperGomme Castegnato',
+      'data': '10 Marzo 2026',
+      'importo': '-€ 20.00',
+      'tipo': 'speso'
+    },
+  ];
 
   final List<Veicolo> _veicoliDisponibili = [
     Veicolo(
@@ -72,6 +94,7 @@ class _MainContainerState extends State<MainContainer> {
         veicolo: _veicoloCorrente,
         kmSlider: _kmSimulatiDalloSlider,
         listaNomiVeicoli: _veicoliDisponibili.map((v) => v.nome).toList(),
+        transazioni: _transazioniWallet,
         onAutoCambiata: (nuovoNome) {
           setState(() {
             _indiceAutoSelezionata = _veicoliDisponibili.indexWhere((v) => v.nome == nuovoNome);
@@ -81,6 +104,11 @@ class _MainContainerState extends State<MainContainer> {
         onKmVariati: (nuoviKm) {
           setState(() {
             _kmSimulatiDalloSlider = nuoviKm;
+          });
+        },
+        onTabCambiato: (index) {
+          setState(() {
+            _indiceSelezionato = index;
           });
         },
       ),
@@ -94,8 +122,29 @@ class _MainContainerState extends State<MainContainer> {
           });
         },
       ), 
-      const BookingPage(),
-      WalletPage(saldoAttuale: _cashbackGlobale), 
+      BookingPage(
+        cashbackDisponibile: _cashbackGlobale,
+        onBookingConfirmed: (nuovaAttivita) {
+          setState(() {
+            _transazioniWallet.insert(0, {
+              'titolo': nuovaAttivita['titolo'],
+              'officina': nuovaAttivita['officina'],
+              'data': nuovaAttivita['data'],
+              'importo': nuovaAttivita['importo'],
+              'tipo': nuovaAttivita['tipo'],
+              'isDiscount': nuovaAttivita['isDiscount'] ?? false,
+            });
+            _cashbackGlobale += nuovaAttivita['cashbackValue'] as double;
+            if (_transazioniWallet.length > 5) {
+              _transazioniWallet.removeLast();
+            }
+          });
+        },
+      ),
+      WalletPage(
+        saldoAttuale: _cashbackGlobale,
+        transazioni: _transazioniWallet,
+      ),
     ];
   }
 

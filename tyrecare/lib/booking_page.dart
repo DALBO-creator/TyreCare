@@ -1,8 +1,16 @@
 // lib/booking_page.dart
 import 'package:flutter/material.dart';
+import 'workshop_selection_page.dart';
 
 class BookingPage extends StatefulWidget {
-  const BookingPage({super.key});
+  final double cashbackDisponibile;
+  final Function(Map<String, dynamic>) onBookingConfirmed;
+
+  const BookingPage({
+    super.key, 
+    required this.cashbackDisponibile,
+    required this.onBookingConfirmed
+  });
 
   @override
   State<BookingPage> createState() => _BookingPageState();
@@ -150,10 +158,16 @@ class _BookingPageState extends State<BookingPage> {
             // IL BOTTONE SOTTILE PREMIUM "Vedi disponibilità"
             OutlinedButton(
               onPressed: () {
-                // Azione futura per mostrare i gommisti disponibili per il servizio selezionato
-                final servizioScelto = _serviziUfficiali[_indiceServizioSelezionato]['titolo'];
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Ricerca disponibilità per: $servizioScelto')),
+                final servizioScelto = _serviziUfficiali[_indiceServizioSelezionato]['titolo'] as String;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => WorkshopSelectionPage(
+                      servizioSelezionato: servizioScelto,
+                      cashbackDisponibile: widget.cashbackDisponibile,
+                      onBookingConfirmed: widget.onBookingConfirmed,
+                    ),
+                  ),
                 );
               },
               style: OutlinedButton.styleFrom(
