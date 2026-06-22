@@ -1,20 +1,21 @@
 // lib/models.dart
 class Pneumatico {
-  final String modello;
+  final String posizione;
   final double pressioneBase;
-  final int usuraIniziale;
+  final int usuraBase;
   final int temperatura;
 
-  const Pneumatico({
-    required this.modello,
+  Pneumatico({
+    required this.posizione,
     required this.pressioneBase,
-    required this.usuraIniziale,
+    required this.usuraBase,
     required this.temperatura,
   });
 
+  // Calcola l'usura dinamica in base alla simulazione dello slider
   int calcolaUsuraDinamica(double kmSimulati) {
     double consumo = kmSimulati / 150; 
-    int usuraAttuale = usuraIniziale - consumo.toInt();
+    int usuraAttuale = usuraBase - consumo.toInt();
     if (usuraAttuale < 10) return 10;
     if (usuraAttuale > 100) return 100;
     return usuraAttuale;
@@ -22,43 +23,38 @@ class Pneumatico {
 }
 
 class Veicolo {
-  final String id;
   final String nome;
-  final int chilometriBase;
-  final int kmUltimoControllo;
-  final int kmProssimoControlloTarget;
   final String anno;
+  final String chilometriIniziali;
   final String immagineUrl;
+  final bool isPrincipale;
   final Pneumatico antSx;
   final Pneumatico antDx;
   final Pneumatico postSx;
   final Pneumatico postDx;
 
-  const Veicolo({
-    required this.id,
+  Veicolo({
     required this.nome,
-    required this.chilometriBase,
-    required this.kmUltimoControllo,
-    required this.kmProssimoControlloTarget,
-    this.anno = '2022',
-    this.immagineUrl = 'https://images.pngimages.com/download/0b18f8e0d6da7e923e1e9a26372bf9dc.png',
+    required this.anno,
+    required this.chilometriIniziali,
+    required this.immagineUrl,
+    this.isPrincipale = false,
     required this.antSx,
     required this.antDx,
     required this.postSx,
     required this.postDx,
   });
-}
 
-class Officina {
-  final String nome;
-  final String indirizzo;
-  final double distanza;
-  final double recensione;
+  int chilometriTotali(double kmSimulati) {
+    int base = int.tryParse(chilometriIniziali) ?? 0;
+    return base + kmSimulati.toInt();
+  }
 
-  const Officina({
-    required this.nome,
-    required this.indirizzo,
-    required this.distanza,
-    required this.recensione,
-  });
+  int mediaUsuraGenerale(double kmSimulati) {
+    int usuraAntSx = antSx.calcolaUsuraDinamica(kmSimulati);
+    int usuraAntDx = antDx.calcolaUsuraDinamica(kmSimulati);
+    int usuraPostSx = postSx.calcolaUsuraDinamica(kmSimulati);
+    int usuraPostDx = postDx.calcolaUsuraDinamica(kmSimulati);
+    return ((usuraAntSx + usuraAntDx + usuraPostSx + usuraPostDx) / 4).round();
+  }
 }

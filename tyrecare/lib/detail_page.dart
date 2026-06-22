@@ -20,7 +20,7 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final List<String> _posizioni = ['ant. sx', 'ant. dx', 'post. sx', 'post. dx'];
+  final List<String> _posizioni = ['Ant. sx', 'Ant. dx', 'Post. sx', 'Post. dx'];
 
   @override
   void initState() {
@@ -50,14 +50,21 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
     return Scaffold(
       backgroundColor: const Color(0xFF1E1E1E),
       appBar: AppBar(
-        title: const Text('Dettaglio Sensore', style: TextStyle(color: Colors.white)),
+        title: const Text('Dettaglio pneumatico', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
         backgroundColor: const Color(0xFF1E1E1E),
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
         bottom: TabBar(
           controller: _tabController,
+          isScrollable: false,
           indicatorColor: Colors.redAccent,
           labelColor: Colors.redAccent,
           unselectedLabelColor: Colors.grey,
+          indicatorWeight: 3,
+          labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
           tabs: _posizioni.map((pos) => Tab(text: pos.toUpperCase())).toList(),
         ),
       ),
@@ -66,27 +73,77 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
         children: _posizioni.map((pos) {
           Pneumatico p = _getPneumaticoDaPosizione(pos);
           int usura = p.calcolaUsuraDinamica(widget.kmSlider);
+          Color coloreStato = usura > 70 ? Colors.greenAccent : (usura > 50 ? Colors.orangeAccent : Colors.redAccent);
 
-          return Padding(
+          return SingleChildScrollView(
             padding: const EdgeInsets.all(20.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // IMMAGINE RUOTA REALISTICA IN PRIMO PIANO
+                const SizedBox(height: 20),
                 Center(
                   child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: const BoxDecoration(color: Color(0xFF252525), shape: BoxShape.circle),
-                    child: const Icon(Icons.album_outlined, size: 100, color: Colors.white70),
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF252525),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 12,
+                          spreadRadius: 2,
+                        )
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.album_outlined, 
+                      size: 110, 
+                      color: Colors.white70
+                    ),
                   ),
                 ),
+                const SizedBox(height: 20),
+
+                // BARRA DI USURA BATTISTRADA PROGRESSIVA
+                const Text('Usura battistrada', style: TextStyle(color: Colors.grey, fontSize: 13)),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: usura / 100,
+                          minHeight: 6,
+                          backgroundColor: Colors.grey[800],
+                          valueColor: AlwaysStoppedAnimation<Color>(coloreStato),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text('$usura%', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                  ],
+                ),
                 const SizedBox(height: 24),
-                Text('Modello: ${p.modello}', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                const Divider(color: Colors.grey),
-                const SizedBox(height: 10),
-                _buildInfoRow('Pressione:', '${p.pressioneBase} bar'),
-                _buildInfoRow('Temperatura:', '${p.temperatura}°C'),
-                _buildInfoRow('Usura Battistrada:', '$usura%'),
-                _buildInfoRow('Stato Sensore:', 'Attivo / Sincronizzato'),
+
+                // GRIGLIA SPECIFICHE STRUTTURATA
+                _buildRigaSpec('Pressione attuale', '${p.pressioneBase} bar'),
+                _buildRigaSpec('Temperatura', '${p.temperatura} °C'),
+                _buildRigaSpec('Chilometri percorsi', '${(12500 + widget.kmSlider).toInt()} km'),
+                _buildRigaSpec('Prossimo controllo consigliato', 'tra 1.200 km'),
+                const SizedBox(height: 30),
+
+                // BOTTONE STORICO CONTROLLI
+                OutlinedButton(
+                  onPressed: () {},
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: Colors.grey[800]!),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: const Text('STORICO CONTROLLI', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+                ),
               ],
             ),
           );
@@ -95,14 +152,17 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+  Widget _buildRigaSpec(String titolo, String valore) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: Colors.grey[900]!, width: 1)),
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 16)),
-          Text(value, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(titolo, style: const TextStyle(color: Colors.grey, fontSize: 14)),
+          Text(valore, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
         ],
       ),
     );

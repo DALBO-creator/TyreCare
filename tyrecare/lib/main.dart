@@ -39,27 +39,27 @@ class _MainContainerState extends State<MainContainer> {
   double _kmSimulatiDalloSlider = 0.0;
 
   final List<Veicolo> _veicoliDisponibili = [
-    const Veicolo(
-      id: 'veicolo_1',
+    Veicolo(
       nome: 'BMW Serie 3',
-      chilometriBase: 43800, // km all'ultimo controllo
-      kmUltimoControllo: 43800,
-      kmProssimoControlloTarget: 1200, 
-      antSx: Pneumatico(modello: 'Pirelli P Zero', pressioneBase: 2.4, usuraIniziale: 90, temperatura: 28),
-      antDx: Pneumatico(modello: 'Pirelli P Zero', pressioneBase: 2.5, usuraIniziale: 95, temperatura: 29),
-      postSx: Pneumatico(modello: 'Pirelli P Zero', pressioneBase: 2.3, usuraIniziale: 85, temperatura: 28),
-      postDx: Pneumatico(modello: 'Pirelli P Zero', pressioneBase: 2.4, usuraIniziale: 92, temperatura: 28),
+      anno: '2019',
+      chilometriIniziali: '43800',
+      immagineUrl: 'https://images.pngimages.com/download/0b18f8e0d6da7e923e1e9a26372bf9dc.png',
+      isPrincipale: true,
+      antSx: Pneumatico(posizione: 'antSx', pressioneBase: 2.4, usuraBase: 90, temperatura: 28),
+      antDx: Pneumatico(posizione: 'antDx', pressioneBase: 2.5, usuraBase: 95, temperatura: 29),
+      postSx: Pneumatico(posizione: 'postSx', pressioneBase: 2.3, usuraBase: 85, temperatura: 28),
+      postDx: Pneumatico(posizione: 'postDx', pressioneBase: 2.4, usuraBase: 92, temperatura: 28),
     ),
-    const Veicolo(
-      id: 'veicolo_2',
+    Veicolo(
       nome: 'Audi A3',
-      chilometriBase: 80000,
-      kmUltimoControllo: 80000,
-      kmProssimoControlloTarget: 3000,
-      antSx: Pneumatico(modello: 'Michelin Pilot Sport', pressioneBase: 2.2, usuraIniziale: 65, temperatura: 25),
-      antDx: Pneumatico(modello: 'Michelin Pilot Sport', pressioneBase: 2.2, usuraIniziale: 67, temperatura: 25),
-      postSx: Pneumatico(modello: 'Michelin Pilot Sport', pressioneBase: 2.1, usuraIniziale: 60, temperatura: 24),
-      postDx: Pneumatico(modello: 'Michelin Pilot Sport', pressioneBase: 2.1, usuraIniziale: 62, temperatura: 24),
+      anno: '2021',
+      chilometriIniziali: '80000',
+      immagineUrl: 'https://images.pngimages.com/download/0b18f8e0d6da7e923e1e9a26372bf9dc.png',
+      isPrincipale: false,
+      antSx: Pneumatico(posizione: 'antSx', pressioneBase: 2.2, usuraBase: 65, temperatura: 25),
+      antDx: Pneumatico(posizione: 'antDx', pressioneBase: 2.2, usuraBase: 67, temperatura: 25),
+      postSx: Pneumatico(posizione: 'postSx', pressioneBase: 2.1, usuraBase: 60, temperatura: 24),
+      postDx: Pneumatico(posizione: 'postDx', pressioneBase: 2.1, usuraBase: 62, temperatura: 24),
     ),
   ];
 
@@ -70,22 +70,27 @@ class _MainContainerState extends State<MainContainer> {
     return [
       HomePage(
         veicolo: _veicoloCorrente,
-        cashbackAttuale: _cashbackGlobale,
-        kmSlider: _kmSimulatiDalloSlider, // <-- Passiamo i km correnti
+        kmSlider: _kmSimulatiDalloSlider,
         listaNomiVeicoli: _veicoliDisponibili.map((v) => v.nome).toList(),
         onAutoCambiata: (nuovoNome) {
           setState(() {
-            _indiceAutoSelezionata = _veicoliDisponibili.indexWhere((v) => v.nome == nuevoNome);
-            _kmSimulatiDalloSlider = 0.0; // Resettiamo lo slider se cambia auto
+            _indiceAutoSelezionata = _veicoliDisponibili.indexWhere((v) => v.nome == nuovoNome);
+            _kmSimulatiDalloSlider = 0.0; // Resettiamo la simulazione se cambia auto
+          });
+        },
+        onKmVariati: (nuoviKm) {
+          setState(() {
+            _kmSimulatiDalloSlider = nuoviKm;
           });
         },
       ),
       CheckPage(
-        veicolo: _veicoloCorrente,
-        kmSlider: _kmSimulatiDalloSlider, // <-- Passiamo i km correnti
-        onKmVariati: (nuoviKm) {
+        veicoli: _veicoliDisponibili,
+        indicePrincipale: _indiceAutoSelezionata,
+        onVeicoloSelezionato: (index) {
           setState(() {
-            _kmSimulatiDalloSlider = nuoviKm; // <-- Aggiorna lo stato globale!
+            _indiceAutoSelezionata = index;
+            _kmSimulatiDalloSlider = 0.0; // Reset simulazione
           });
         },
       ), 

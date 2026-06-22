@@ -78,50 +78,70 @@ class _BookingPageState extends State<BookingPage> {
 
             // LA LISTA DEI SERVIZI PRESI DAL MOCKUP
             Expanded(
-              child: ListView.builder(
-                itemCount: _serviziUfficiali.length,
-                itemBuilder: (context, index) {
+              child: Column(
+                children: List.generate(_serviziUfficiali.length, (index) {
                   final servizio = _serviziUfficiali[index];
                   final isSelezionato = _indiceServizioSelezionato == index;
 
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF252525), // Grigio scuro coerente con lo sfondo delle card
-                      borderRadius: BorderRadius.circular(12),
-                      // Se è selezionato, mostriamo un leggero bordo di feedback primario
-                      border: Border.all(
-                        color: isSelezionato ? Colors.redAccent.withOpacity(0.5) : Colors.transparent,
-                        width: 1,
+                  return Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF252525),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSelezionato ? Colors.redAccent.withOpacity(0.5) : Colors.transparent,
+                          width: 1,
+                        ),
                       ),
-                    ),
-                    child: ListTile(
-                      onTap: () {
-                        setState(() {
-                          _indiceServizioSelezionato = index;
-                        });
-                      },
-                      leading: Icon(
-                        servizio['icona'] as IconData, 
-                        color: isSelezionato ? Colors.redAccent : Colors.grey,
-                        size: 24,
-                      ),
-                      title: Text(
-                        servizio['titolo'] as String,
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                      ),
-                      subtitle: Text(
-                        servizio['sottotitolo'] as String,
-                        style: const TextStyle(color: Colors.grey, fontSize: 12),
-                      ),
-                      trailing: const Icon(
-                        Icons.arrow_forward_ios, 
-                        color: Colors.grey, 
-                        size: 14,
+                      child: InkWell(
+                        onTap: () {
+                          setState(() {
+                            _indiceServizioSelezionato = index;
+                          });
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(
+                            children: [
+                              Icon(
+                                servizio['icona'] as IconData, 
+                                color: isSelezionato ? Colors.redAccent : Colors.grey,
+                                size: 24,
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      servizio['titolo'] as String,
+                                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      servizio['sottotitolo'] as String,
+                                      style: const TextStyle(color: Colors.grey, fontSize: 11),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Icon(
+                                Icons.arrow_forward_ios, 
+                                color: Colors.grey, 
+                                size: 14,
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   );
-                },
+                }),
               ),
             ),
 
