@@ -1,5 +1,5 @@
+// lib/booking_page.dart
 import 'package:flutter/material.dart';
-import 'slots_page.dart';
 
 class BookingPage extends StatefulWidget {
   const BookingPage({super.key});
@@ -130,27 +130,27 @@ class _BookingPageState extends State<BookingPage> {
             // IL BOTTONE SOTTILE PREMIUM "Vedi disponibilità"
             OutlinedButton(
               onPressed: () {
-                // RECUPERIAMO IL TESTO DEL SERVIZIO SELEZIONATO
-                final servizioScelto = _serviziUfficiali[_indiceServizioSelezionato]['title'] ?? 
-                                       _serviziUfficiali[_indiceServizioSelezionato]['titolo'];
-                
-                // NAVIGHIAMO SULLA SLOTSPAGE PASSANDO IL SERVIZIO
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SlotsPage(servizioScelto: servizioScelto),
-                  ),
+                // Azione futura per mostrare i gommisti disponibili per il servizio selezionato
+                final servizioScelto = _serviziUfficiali[_indiceServizioSelezionato]['titolo'];
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Ricerca disponibilità per: $servizioScelto')),
                 );
               },
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Color(0xFF4A1519), width: 1.5),
+                side: const BorderSide(color: Color(0xFF4A1519), width: 1.5), // Bordo rosso scuro sottile come nel mockup
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 backgroundColor: const Color(0xFF1E1E1E),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
               child: const Text(
                 'Vedi disponibilità',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15),
+                style: TextStyle(
+                  color: Colors.white, 
+                  fontWeight: FontWeight.w600, 
+                  fontSize: 15,
+                ),
               ),
             ),
           ],

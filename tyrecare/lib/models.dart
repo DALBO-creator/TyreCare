@@ -29,7 +29,6 @@ class Veicolo {
   final int kmProssimoControlloTarget;
   final String anno;
   final String immagineUrl;
-
   final Pneumatico antSx;
   final Pneumatico antDx;
   final Pneumatico postSx;
@@ -47,5 +46,19 @@ class Veicolo {
     required this.antDx,
     required this.postSx,
     required this.postDx,
+  });
+}
+
+class Officina {
+  final String nome;
+  final String indirizzo;
+  final double distanza;
+  final double recensione;
+
+  const Officina({
+    required this.nome,
+    required this.indirizzo,
+    required this.distanza,
+    required this.recensione,
   });
 }

@@ -61,7 +61,7 @@ class CheckPage extends StatelessWidget {
                 color: const Color(0xFF252525),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: isCorrente ? Colors.redAccent.withOpacity(0.5) : Colors.transparent,
+                  color: isCorrente ? Colors.redAccent.withValues(alpha: 0.5) : Colors.transparent,
                   width: 1.5,
                 ),
               ),
@@ -76,7 +76,7 @@ class CheckPage extends StatelessWidget {
                             margin: const EdgeInsets.only(bottom: 6.0),
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFC62828).withOpacity(0.15),
+                              color: const Color(0xFFC62828).withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: const Text('Principale', style: TextStyle(color: Colors.redAccent, fontSize: 10, fontWeight: FontWeight.bold)),

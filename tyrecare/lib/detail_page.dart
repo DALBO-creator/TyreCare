@@ -50,21 +50,14 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
     return Scaffold(
       backgroundColor: const Color(0xFF1E1E1E),
       appBar: AppBar(
-        title: const Text('Dettaglio pneumatico', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
+        title: const Text('Dettaglio Sensore', style: TextStyle(color: Colors.white)),
         backgroundColor: const Color(0xFF1E1E1E),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
         bottom: TabBar(
           controller: _tabController,
-          isScrollable: false,
           indicatorColor: Colors.redAccent,
           labelColor: Colors.redAccent,
           unselectedLabelColor: Colors.grey,
-          indicatorWeight: 3,
-          labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
           tabs: _posizioni.map((pos) => Tab(text: pos.toUpperCase())).toList(),
         ),
       ),
@@ -73,78 +66,27 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
         children: _posizioni.map((pos) {
           Pneumatico p = _getPneumaticoDaPosizione(pos);
           int usura = p.calcolaUsuraDinamica(widget.kmSlider);
-          Color coloreStato = usura > 70 ? Colors.greenAccent : (usura > 50 ? Colors.orangeAccent : Colors.redAccent);
 
-          return SingleChildScrollView(
+          return Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  height: 180,
-                  alignment: Alignment.center,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Image.network(
-                        'https://images.unsplash.com/photo-1580273916550-e323be2ae537?q=80&w=400&auto=format&fit=crop', 
-                        fit: BoxFit.contain,
-                      ),
-                      Positioned(
-                        top: 60,
-                        left: 110,
-                        child: Container(
-                          width: 10,
-                          height: 10,
-                          decoration: BoxDecoration(
-                            color: Colors.redAccent,
-                            shape: BoxShape.circle,
-                            boxShadow: [BoxShadow(color: Colors.redAccent.withOpacity(0.8), blurRadius: 8, spreadRadius: 2)],
-                          ),
-                        ),
-                      )
-                    ],
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: const BoxDecoration(color: Color(0xFF252525), shape: BoxShape.circle),
+                    child: const Icon(Icons.album_outlined, size: 100, color: Colors.white70),
                   ),
-                ),
-                const SizedBox(height: 16),
-
-                const Text('Usura battistrada', style: TextStyle(color: Colors.grey, fontSize: 13)),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: LinearProgressIndicator(
-                          value: usura / 100,
-                          minHeight: 6,
-                          backgroundColor: Colors.grey[800],
-                          valueColor: AlwaysStoppedAnimation<Color>(coloreStato),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Text('$usura%', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-                  ],
                 ),
                 const SizedBox(height: 24),
-
-                _buildRigaSpec('Modello copertura', p.modello),
-                _buildRigaSpec('Pressione attuale', '${p.pressioneBase} bar'),
-                _buildRigaSpec('Temperatura esercizio', '${p.temperatura} °C'),
-                _buildRigaSpec('Chilometri totali', '${(widget.veicolo.chilometriBase + widget.kmSlider).toInt()} km'),
-                _buildRigaSpec('Target prossimo controllo', 'tra ${widget.veicolo.kmProssimoControlloTarget} km'),
-                const SizedBox(height: 30),
-
-                OutlinedButton(
-                  onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: Colors.grey[800]!),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: const Text('STORICO CONTROLLI', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
-                ),
+                Text('Modello: ${p.modello}', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                const Divider(color: Colors.grey),
+                const SizedBox(height: 10),
+                _buildInfoRow('Pressione:', '${p.pressioneBase} bar'),
+                _buildInfoRow('Temperatura:', '${p.temperatura}°C'),
+                _buildInfoRow('Usura Battistrada:', '$usura%'),
+                _buildInfoRow('Stato Sensore:', 'Attivo / Sincronizzato'),
               ],
             ),
           );
@@ -153,17 +95,14 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
     );
   }
 
-  Widget _buildRigaSpec(String titolo, String valore) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.grey[900]!, width: 1)),
-      ),
+  Widget _buildInfoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(titolo, style: const TextStyle(color: Colors.grey, fontSize: 14)),
-          Text(valore, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 16)),
+          Text(value, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
         ],
       ),
     );

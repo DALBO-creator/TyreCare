@@ -55,7 +55,7 @@ class _SlotsPageState extends State<SlotsPage> {
                   color: const Color(0xFF252525),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isSelezionata ? Colors.redAccent.withOpacity(0.5) : Colors.transparent,
+                    color: isSelezionata ? Colors.redAccent.withValues(alpha: 0.5) : Colors.transparent,
                     width: 1,
                   ),
                 ),
