@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "308418932482",
+    "project_id": "tyrecare-2fe9a",
+    "storage_bucket": "tyrecare-2fe9a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:308418932482:android:a011ba1480ee4b94325c1b",
+        "android_client_info": {
+          "package_name": "com.example.tyrecare"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "308418932482-62vte62j5sg2m6rg8bi388bd2ualtcml.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVG2xixBmt_EQjrIsmAbIexl9RTKc43DA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "308418932482-62vte62j5sg2m6rg8bi388bd2ualtcml.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

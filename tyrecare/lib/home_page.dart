@@ -128,7 +128,7 @@ class HomePage extends StatelessWidget {
 
             // 3. STATO GENERALE PNEUMATICI (MOCKUP STILE ANTEPRIMA)
             Container(
-              padding: const EdgeInsets.all(12), // Ridotto padding interno da 16 a 12
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Ridotto padding verticale da 12 a 8
               decoration: BoxDecoration(
                 color: const Color(0xFF161616).withOpacity(0.9),
                 borderRadius: BorderRadius.circular(16),
@@ -142,38 +142,38 @@ class HomePage extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Stato generale pneumatici', style: TextStyle(color: Colors.grey, fontSize: 13)),
-                          const SizedBox(height: 4), // Ridotto da 6 a 4
+                          const Text('Stato generale pneumatici', style: TextStyle(color: Colors.grey, fontSize: 12)), // Ridotto da 13 a 12
+                          const SizedBox(height: 2), // Ridotto da 4 a 2
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.baseline,
                             textBaseline: TextBaseline.alphabetic,
                             children: [
-                              Text('$mediaUsura', style: const TextStyle(fontSize: 34, fontWeight: FontWeight.bold, color: Colors.white)), // Ridotto font da 38 a 34
-                              const Text('%', style: TextStyle(fontSize: 18, color: Colors.white)),
+                              Text('$mediaUsura', style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white)), // Ridotto da 34 a 32
+                              const Text('%', style: TextStyle(fontSize: 16, color: Colors.white)),
                             ],
                           ),
-                          const SizedBox(height: 2), // Ridotto da 4 a 2
+                          const SizedBox(height: 0), // Ridotto da 2 a 0
                           Text(
                             mediaUsura > 70 ? 'Ottimo stato' : (mediaUsura > 50 ? 'Stato medio' : 'Urgente controllo'), 
-                            style: TextStyle(color: coloreStatoGenerale, fontWeight: FontWeight.bold, fontSize: 13) // Ridotto font da 14 a 13
+                            style: TextStyle(color: coloreStatoGenerale, fontWeight: FontWeight.bold, fontSize: 12) // Ridotto da 13 a 12
                           ),
                         ],
                       ),
                       // Grafico ad anello circolare nativo
                       SizedBox(
-                        width: 65, // Ridotto da 75 a 65
-                        height: 65,
+                        width: 55, // Ridotto da 65 a 55
+                        height: 55,
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
                             CircularProgressIndicator(
                               value: 1.0, 
-                              strokeWidth: 7, // Ridotto da 8 a 7
+                              strokeWidth: 6, // Ridotto da 7 a 6
                               valueColor: const AlwaysStoppedAnimation<Color>(Colors.redAccent),
                             ),
                             CircularProgressIndicator(
                               value: mediaUsura / 100,
-                              strokeWidth: 7, // Ridotto da 8 a 7
+                              strokeWidth: 6, // Ridotto da 7 a 6
                               backgroundColor: Colors.transparent,
                               valueColor: AlwaysStoppedAnimation<Color>(coloreStatoGenerale),
                             ),
@@ -183,7 +183,7 @@ class HomePage extends StatelessWidget {
                     ],
                   ),
                   const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10.0), // Ridotto da 12 a 10
+                    padding: EdgeInsets.symmetric(vertical: 6.0), // Ridotto da 10 a 6
                     child: Divider(color: Color(0xFF1F1F1F), height: 1),
                   ),
                   // INFO CONTROLLI INTEGRATE NELLA CARD
@@ -193,17 +193,15 @@ class HomePage extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Ultimo controllo', style: TextStyle(color: Colors.grey, fontSize: 10)), // Ridotto da 11 a 10
-                          const SizedBox(height: 2), // Ridotto da 4 a 2
-                          const Text('12 Marzo 2024', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500)), // Ridotto da 13 a 12
+                          const Text('Ultimo controllo', style: TextStyle(color: Colors.grey, fontSize: 10)),
+                          const Text('12 Marzo 2024', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500)), // Ridotto da 12 a 11
                         ],
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text('Prossimo controllo', style: TextStyle(color: Colors.grey, fontSize: 10)),
-                          const SizedBox(height: 2),
-                          const Text('tra 1.200 km', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500)),
+                          const Text('tra 1.200 km', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500)), // Ridotto da 12 a 11
                         ],
                       ),
                     ],
@@ -215,7 +213,7 @@ class HomePage extends StatelessWidget {
 
             // 4. PLANCIA TOP-DOWN DIAGNOSTICA (Layout a Stack per angoli e auto grande)
             Expanded(
-              flex: 5,
+              flex: 6, // Aumentato da 5 a 6 per dare più spazio
               child: Container(
                 decoration: BoxDecoration(
                   color: const Color(0xFF0A0A0A),
@@ -246,11 +244,11 @@ class HomePage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    // CARD AI 4 ANGOLI (Posizionamento distanziato per evitare sovrapposizioni)
-                    Positioned(top: 22, left: 16, child: _buildCardTire(context, 'Ant. sx', veicolo.antSx, uAntSx)),
-                    Positioned(top: 22, right: 16, child: _buildCardTire(context, 'Ant. dx', veicolo.antDx, uAntDx)),
-                    Positioned(bottom: 22, left: 16, child: _buildCardTire(context, 'Post. sx', veicolo.postSx, uPostSx)),
-                    Positioned(bottom: 22, right: 16, child: _buildCardTire(context, 'Post. dx', veicolo.postDx, uPostDx)),
+                    // CARD AI 4 ANGOLI (Posizionamento ottimizzato per evitare sovrapposizioni)
+                    Positioned(top: 10, left: 16, child: _buildCardTire(context, 'Ant. sx', veicolo.antSx, uAntSx)),
+                    Positioned(top: 10, right: 16, child: _buildCardTire(context, 'Ant. dx', veicolo.antDx, uAntDx)),
+                    Positioned(bottom: 10, left: 16, child: _buildCardTire(context, 'Post. sx', veicolo.postSx, uPostSx)),
+                    Positioned(bottom: 10, right: 16, child: _buildCardTire(context, 'Post. dx', veicolo.postDx, uPostDx)),
                   ],
                 ),
               ),
@@ -284,8 +282,8 @@ class HomePage extends StatelessWidget {
       },
       child: Container(
         width: 82, 
-        height: 90, // Aumentata dimensione per ospitare il mini grafico
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        height: 84, // Ridotta altezza da 90 a 84 per evitare sovrapposizioni verticali
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
           color: const Color(0xFF1A1A1A).withOpacity(0.9),
           borderRadius: BorderRadius.circular(12),

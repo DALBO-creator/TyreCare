@@ -1,12 +1,25 @@
 // lib/main.dart
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'models.dart';
 import 'home_page.dart';
 import 'check_page.dart';
 import 'booking_page.dart';
 import 'wallet_page.dart';
+import 'profile_page.dart';
+import 'splash_page.dart';
+import 'login_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Nota: Firebase richiede la configurazione specifica per piattaforma (google-services.json / GoogleService-Info.plist)
+  // Se non l'hai ancora fatta, questa riga darà errore.
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    print("Firebase non inizializzato: assicurati di aver aggiunto i file di configurazione.");
+  }
   runApp(const MyApp());
 }
 
@@ -27,8 +40,57 @@ class MyApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
-      home: const MainContainer(),
+      home: const AuthWrapper(),
     );
+  }
+}
+
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(body: Center(child: CircularProgressIndicator(color: Colors.redAccent)));
+        }
+        if (snapshot.hasData) {
+          return const Initializer();
+        } else {
+          return const LoginPage();
+        }
+      },
+    );
+  }
+}
+
+class Initializer extends StatefulWidget {
+  const Initializer({super.key});
+
+  @override
+  State<Initializer> createState() => _InitializerState();
+}
+
+class _InitializerState extends State<Initializer> {
+  bool _showSplash = true;
+
+  @override
+  Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+    if (_showSplash) {
+      return SplashPage(
+        nomeUtente: user?.displayName ?? user?.email?.split('@')[0] ?? "Utente",
+        modelloAuto: "BMW Serie 3", // Modello principale
+        onFinish: () {
+          setState(() {
+            _showSplash = false;
+          });
+        },
+      );
+    }
+    return const MainContainer();
   }
 }
 
@@ -153,6 +215,7 @@ class _MainContainerState extends State<MainContainer> {
         saldoAttuale: _cashbackGlobale,
         transazioni: _transazioniWallet,
       ),
+      const ProfilePage(),
     ];
   }
 
@@ -172,6 +235,7 @@ class _MainContainerState extends State<MainContainer> {
           BottomNavigationBarItem(icon: Icon(Icons.directions_car), label: 'Auto'),
           BottomNavigationBarItem(icon: Icon(Icons.calendar_month), label: 'Prenota'),
           BottomNavigationBarItem(icon: Icon(Icons.account_balance_wallet), label: 'Wallet'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profilo'),
         ],
       ),
     );
