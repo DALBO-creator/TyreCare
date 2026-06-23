@@ -50,11 +50,13 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1E1E1E),
+      backgroundColor: const Color(0xFF0A0A0A),
       appBar: AppBar(
-        title: const Text('Dettaglio pneumatico', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
-        backgroundColor: const Color(0xFF1E1E1E),
+        title: const Text('Dettaglio pneumatico',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
+        backgroundColor: const Color(0xFF0A0A0A),
         elevation: 0,
+        centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
@@ -65,7 +67,7 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
           indicatorColor: Colors.redAccent,
           labelColor: Colors.redAccent,
           unselectedLabelColor: Colors.grey,
-          indicatorWeight: 3,
+          indicatorWeight: 2,
           labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
           tabs: _posizioni.map((pos) => Tab(text: pos.toUpperCase())).toList(),
         ),
@@ -78,75 +80,86 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
           Color coloreStato = usura > 70 ? Colors.greenAccent : (usura > 50 ? Colors.orangeAccent : Colors.redAccent);
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // IMMAGINE RUOTA REALISTICA IN PRIMO PIANO
-                const SizedBox(height: 20),
-                Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF252525),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
-                          blurRadius: 12,
-                          spreadRadius: 2,
-                        )
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.album_outlined, 
-                      size: 110, 
-                      color: Colors.white70
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // BARRA DI USURA BATTISTRADA PROGRESSIVA
-                const Text('Usura battistrada', style: TextStyle(color: Colors.grey, fontSize: 13)),
-                const SizedBox(height: 8),
-                Row(
+                // IMMAGINE RUOTA REALISTICA (RIDOTTA PER FAR SALIRE LA CARD)
+                Stack(
+                  alignment: Alignment.center,
                   children: [
-                    Expanded(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: LinearProgressIndicator(
-                          value: usura / 100,
-                          minHeight: 6,
-                          backgroundColor: Colors.grey[800],
-                          valueColor: AlwaysStoppedAnimation<Color>(coloreStato),
+                    // GRADIENTE DI SFONDO ULTRA-SMOOTH (LEGGERMENTE PIÙ SCURO)
+                    Container(
+                      height: 300,
+                      decoration: BoxDecoration(
+                        gradient: RadialGradient(
+                          center: Alignment.center,
+                          radius: 0.8,
+                          colors: [
+                            const Color(0xFF141414).withOpacity(0.35), // Sfumatura centrale scurita
+                            const Color(0xFF0E0E0E).withOpacity(0.15), // Sfumatura intermedia scurita
+                            const Color(0xFF0A0A0A), // Sfondo finale
+                          ],
+                          stops: const [0.0, 0.5, 1.0],
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Text('$usura%', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                    // CERCHIONE ZOOMMATO
+                    Image.asset(
+                      'assets/cerchioneTyreCare.png',
+                      width: MediaQuery.of(context).size.width * 1.05, // Leggermente ridotto lo zoom
+                      height: 280, // Ridotta altezza da 380 a 280
+                      fit: BoxFit.contain,
+                    ),
                   ],
                 ),
-                const SizedBox(height: 24),
 
-                // GRIGLIA SPECIFICHE STRUTTURATA
-                _buildRigaSpec('Pressione attuale', '${p.pressioneBase} bar'),
-                _buildRigaSpec('Temperatura', '${p.temperatura} °C'),
-                _buildRigaSpec('Chilometri percorsi', '${(12500 + widget.kmSlider).toInt()} km'),
-                _buildRigaSpec('Prossimo controllo consigliato', 'tra 1.200 km'),
-                const SizedBox(height: 30),
+                // CONTENUTO INFERIORE CON PADDING
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 20.0), // Rimosso padding top per far salire la card
+                  child: Column(
+                    children: [
+                      // CARD PRINCIPALE INFO (STILE LIQUID GLASS)
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF161616).withOpacity(0.8),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.white.withOpacity(0.1), width: 0.5),
+                        ),
+                        child: Column(
+                          children: [
+                            _buildRigaInfoProgressiva('Usura battistrada', '$usura%', usura / 100, coloreStato),
+                            const SizedBox(height: 16),
+                            _buildRigaInfoProgressiva('Pressione attuale', '${p.pressioneBase} bar', (p.pressioneBase / 3.0).clamp(0, 1), coloreStato),
+                            const SizedBox(height: 16),
+                            _buildRigaInfoSemplice('Temperatura', '${p.temperatura} °C'),
+                            const SizedBox(height: 16),
+                            _buildRigaInfoSemplice('Chilometri percorsi', '${(12500 + widget.kmSlider).toInt()} km'),
+                            const SizedBox(height: 16),
+                            _buildRigaInfoSemplice('Prossimo controllo consigliato', 'tra 1.200 km'),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
 
-                // BOTTONE STORICO CONTROLLI
-                OutlinedButton(
-                  onPressed: () {
-                    _mostraStoricoControlli(context);
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: Colors.grey[800]!),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      // BOTTONE STORICO CONTROLLI
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton(
+                          onPressed: () => _mostraStoricoControlli(context),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: Colors.white.withOpacity(0.15)),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            backgroundColor: const Color(0xFF161616).withOpacity(0.5),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          child: const Text('STORICO CONTROLLI', 
+                            style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                    ],
                   ),
-                  child: const Text('STORICO CONTROLLI', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
                 ),
               ],
             ),
@@ -156,13 +169,48 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
     );
   }
 
+  Widget _buildRigaInfoProgressiva(String titolo, String valore, double progress, Color colore) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(titolo, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+            Text(valore, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        const SizedBox(height: 8),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: LinearProgressIndicator(
+            value: progress,
+            minHeight: 4,
+            backgroundColor: Colors.white.withOpacity(0.05),
+            valueColor: AlwaysStoppedAnimation<Color>(colore),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRigaInfoSemplice(String titolo, String valore) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(titolo, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+        Text(valore, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+      ],
+    );
+  }
+
   void _mostraStoricoControlli(BuildContext context) {
     // Filtriamo solo i "guadagni" (prenotazioni/interventi) ed escludiamo i riscatti cashback se vogliamo solo lo storico tecnico
     final controlli = widget.transazioni.where((t) => t['isDiscount'] != true && t['tipo'] == 'guadagno').toList();
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1E1E1E),
+      backgroundColor: const Color(0xFF0A0A0A),
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -211,8 +259,9 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                             margin: const EdgeInsets.only(bottom: 12),
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF252525),
+                              color: const Color(0xFF161616).withOpacity(0.9),
                               borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.white.withOpacity(0.08), width: 0.5),
                             ),
                             child: Row(
                               children: [
@@ -253,22 +302,6 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
           },
         );
       },
-    );
-  }
-
-  Widget _buildRigaSpec(String titolo, String valore) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.grey[900]!, width: 1)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(titolo, style: const TextStyle(color: Colors.grey, fontSize: 14)),
-          Text(valore, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
-        ],
-      ),
     );
   }
 }

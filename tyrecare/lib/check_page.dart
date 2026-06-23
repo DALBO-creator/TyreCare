@@ -17,10 +17,10 @@ class CheckPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1E1E1E),
+      backgroundColor: const Color(0xFF0A0A0A),
       appBar: AppBar(
         title: const Text('Il mio garage', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: const Color(0xFF0A0A0A),
         elevation: 0,
         centerTitle: false,
         actions: [
@@ -56,43 +56,58 @@ class CheckPage extends StatelessWidget {
             onTap: () => onVeicoloSelezionato(index),
             child: Container(
               margin: const EdgeInsets.only(bottom: 16.0),
-              padding: const EdgeInsets.all(16),
+              // Padding rimosso a destra e verticale per permettere all'auto di toccare i bordi
+              padding: const EdgeInsets.only(left: 16, top: 0, bottom: 0, right: 0),
               decoration: BoxDecoration(
-                color: const Color(0xFF252525),
+                color: const Color(0xFF161616).withOpacity(0.9),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: isSelezionato ? Colors.redAccent.withOpacity(0.5) : Colors.transparent,
-                  width: 1.5,
+                  color: isSelezionato ? Colors.redAccent.withOpacity(0.5) : Colors.white.withOpacity(0.08),
+                  width: 0.5,
                 ),
               ),
               child: Row(
                 children: [
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (isSelezionato)
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 6.0),
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFC62828).withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(6),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (isSelezionato)
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 6.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFC62828).withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: const Text('Principale', style: TextStyle(color: Colors.redAccent, fontSize: 10, fontWeight: FontWeight.bold)),
                           ),
-                          child: const Text('Principale', style: TextStyle(color: Colors.redAccent, fontSize: 10, fontWeight: FontWeight.bold)),
-                        ),
-                      Text(v.nome, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 4),
-                      Text('${v.anno} • ${v.chilometriIniziali}', style: const TextStyle(color: Colors.grey, fontSize: 12)),
-                    ],
+                        Text(v.nome, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 4),
+                        Text('${v.anno} • ${v.chilometriIniziali}', style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(
-                  width: 100,
-                  height: 60,
-                  child: Opacity(
-                    opacity: 0.3,
-                    child: Icon(Icons.directions_car, size: 50, color: Colors.white),
+                // Immagine zoomata che tocca i bordi top, bottom e right
+                SizedBox(
+                  width: 140, // Aumentata larghezza
+                  height: 100, // Aumentata altezza per coprire la card
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topRight: Radius.circular(16),
+                      bottomRight: Radius.circular(16),
+                    ),
+                    child: Opacity(
+                      opacity: 0.9,
+                      child: Image.asset(
+                        'assets/macchinaGarage.png',
+                        fit: BoxFit.cover, // Zoom per riempire il contenitore
+                        alignment: Alignment.centerLeft, // Mantiene visibile il muso/fiancata
+                      ),
+                    ),
                   ),
                 ),
               ],

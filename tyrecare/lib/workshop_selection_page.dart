@@ -46,7 +46,7 @@ class _WorkshopSelectionPageState extends State<WorkshopSelectionPage> {
             colorScheme: const ColorScheme.dark(
               primary: Colors.redAccent,
               onPrimary: Colors.white,
-              surface: Color(0xFF252525),
+              surface: Color(0xFF161616),
               onSurface: Colors.white,
             ),
           ),
@@ -64,10 +64,10 @@ class _WorkshopSelectionPageState extends State<WorkshopSelectionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1E1E1E),
+      backgroundColor: const Color(0xFF0A0A0A),
       appBar: AppBar(
         title: const Text('Seleziona Officina', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: const Color(0xFF0A0A0A),
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
@@ -94,7 +94,7 @@ class _WorkshopSelectionPageState extends State<WorkshopSelectionPage> {
               return Container(
                 margin: const EdgeInsets.only(bottom: 8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF252525),
+                  color: const Color(0xFF161616),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isSelezionata ? Colors.redAccent : Colors.transparent,
@@ -126,7 +126,7 @@ class _WorkshopSelectionPageState extends State<WorkshopSelectionPage> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF252525),
+                  color: const Color(0xFF161616),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -165,7 +165,7 @@ class _WorkshopSelectionPageState extends State<WorkshopSelectionPage> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       decoration: BoxDecoration(
-                        color: isSelezionato ? Colors.redAccent : const Color(0xFF252525),
+                        color: isSelezionato ? Colors.redAccent : const Color(0xFF161616),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -193,7 +193,7 @@ class _WorkshopSelectionPageState extends State<WorkshopSelectionPage> {
               const SizedBox(height: 12),
               Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFF252525),
+                  color: const Color(0xFF161616),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: _usaCashback ? Colors.greenAccent.withOpacity(0.5) : Colors.transparent,
@@ -247,7 +247,7 @@ class _WorkshopSelectionPageState extends State<WorkshopSelectionPage> {
                       showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
-                          backgroundColor: const Color(0xFF252525),
+                          backgroundColor: const Color(0xFF161616),
                           title: const Text('Prenotazione Confermata', style: TextStyle(color: Colors.white)),
                           content: Text(
                             _usaCashback 

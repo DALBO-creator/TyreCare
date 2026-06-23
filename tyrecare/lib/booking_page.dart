@@ -62,10 +62,10 @@ class _BookingPageState extends State<BookingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1E1E1E),
+      backgroundColor: const Color(0xFF0A0A0A),
       appBar: AppBar(
         title: const Text('Prenota un servizio', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: const Color(0xFF0A0A0A),
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
@@ -95,11 +95,11 @@ class _BookingPageState extends State<BookingPage> {
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF252525),
+                        color: const Color(0xFF161616).withOpacity(0.9),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: isSelezionato ? Colors.redAccent.withOpacity(0.5) : Colors.transparent,
-                          width: 1,
+                          color: isSelezionato ? Colors.redAccent.withOpacity(0.5) : Colors.white.withOpacity(0.08),
+                          width: 0.5,
                         ),
                       ),
                       child: InkWell(
@@ -173,7 +173,7 @@ class _BookingPageState extends State<BookingPage> {
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Color(0xFF4A1519), width: 1.5), // Bordo rosso scuro sottile come nel mockup
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: const Color(0xFF1E1E1E),
+                backgroundColor: const Color(0xFF0A0A0A),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),

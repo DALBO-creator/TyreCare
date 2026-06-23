@@ -38,12 +38,12 @@ class HomePage extends StatelessWidget {
         : (mediaUsura > 50 ? Colors.orangeAccent : Colors.redAccent);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1E1E1E),
+      backgroundColor: const Color(0xFF0A0A0A),
       appBar: AppBar(
         title: DropdownButtonHideUnderline(
           child: DropdownButton<String>(
             value: veicolo.nome,
-            dropdownColor: const Color(0xFF2D2D2D),
+            dropdownColor: const Color(0xFF1A1A1A),
             icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey, size: 20),
             isDense: true,
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
@@ -63,7 +63,7 @@ class HomePage extends StatelessWidget {
             },
           ),
         ),
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: const Color(0xFF0A0A0A),
         elevation: 0,
         actions: [
           IconButton(
@@ -74,59 +74,29 @@ class HomePage extends StatelessWidget {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0), // Padding verticale azzerato per alzare tutto
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 1. MODELLO 3D AUTO IN PROSPETTIVA (Contenitore ridotto, Zoom aumentato)
+              // 1. LOGO TYRECARE (Sostituito al modello 3D)
               SizedBox(
-                height: 170,
-                child: Stack(
-                  children: [
-                    ModelViewer(
-                      backgroundColor: const Color(0xFF1E1E1E),
-                      src: 'assets/bmw_m4csl-v1.glb',
-                      alt: "Test Modello 3D",
-                      autoRotate: true,
-                      cameraControls: true,
-                      disableZoom: true,
-                      autoPlay: true,
-                      ar: false,
-                      loading: Loading.eager,
-                      cameraOrbit: "0deg 75deg 65%", // Inclinazione più alta (75°) e più lontana (65%) per non tagliare il muso
-                      minCameraOrbit: "auto 75deg auto", 
-                      maxCameraOrbit: "auto 75deg auto", 
-                      fieldOfView: "22deg",          // Campo visivo leggermente più ampio
-                      interpolationDecay: 400,
-                    ),
-                    // ICONA 360°
-                    Positioned(
-                      bottom: 8,
-                      right: 8,
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.4),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.threed_rotation,
-                          color: Colors.white70,
-                          size: 18,
-                        ),
-                      ),
-                    ),
-                  ],
+                height: 120, // Altezza intermedia per bilanciare lo spazio
+                child: Center(
+                  child: Image.asset(
+                    'assets/logoTyreCare.png',
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
-              const SizedBox(height: 8), // Ridotto da 12 a 8
+              const SizedBox(height: 6), // Ridotto da 8 a 6
 
               // 2. SLIDER DEI CHILOMETRI INTEGRATO CON CURA
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF252525),
+                  color: const Color(0xFF161616).withOpacity(0.9),
                   borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: Colors.white.withOpacity(0.08), width: 0.5),
                 ),
                 child: Row(
                   children: [
@@ -147,21 +117,22 @@ class HomePage extends StatelessWidget {
                         max: 15000,
                         divisions: 150,
                         activeColor: Colors.redAccent,
-                        inactiveColor: Colors.grey[800],
+                        inactiveColor: const Color(0xFF2A2A2A),
                         onChanged: (newValue) => onKmVariati(newValue),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 8), // Ridotto da 12 a 8
+              const SizedBox(height: 6), // Ridotto da 8 a 6
 
             // 3. STATO GENERALE PNEUMATICI (MOCKUP STILE ANTEPRIMA)
             Container(
               padding: const EdgeInsets.all(12), // Ridotto padding interno da 16 a 12
               decoration: BoxDecoration(
-                color: const Color(0xFF252525),
+                color: const Color(0xFF161616).withOpacity(0.9),
                 borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white.withOpacity(0.08), width: 0.5),
               ),
               child: Column(
                 children: [
@@ -213,7 +184,7 @@ class HomePage extends StatelessWidget {
                   ),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 10.0), // Ridotto da 12 a 10
-                    child: Divider(color: Color(0xFF333333), height: 1),
+                    child: Divider(color: Color(0xFF1F1F1F), height: 1),
                   ),
                   // INFO CONTROLLI INTEGRATE NELLA CARD
                   Row(
@@ -240,63 +211,46 @@ class HomePage extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 12), // Ridotto da 16 a 12
+            const SizedBox(height: 8), // Ridotto da 12 a 8
 
-            // 4. PLANCIA TOP-DOWN DIAGNOSTICA CON LED E CARD RETTANGOLARI
+            // 4. PLANCIA TOP-DOWN DIAGNOSTICA (Layout a Stack per angoli e auto grande)
             Expanded(
-              flex: 4, // Aumentato leggermente il flex per dare respiro alle card
+              flex: 5,
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF252525),
+                  color: const Color(0xFF0A0A0A),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Row(
+                child: Stack(
                   children: [
-                    // Colonna SX
-                    Expanded(
-                      flex: 4,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _buildCardTire(context, 'Ant. sx', veicolo.antSx, uAntSx),
-                          _buildCardTire(context, 'Post. sx', veicolo.postSx, uPostSx),
-                        ],
-                      ),
-                    ),
-                    // Chassis centrale con immagine auto + bagliore gomme
-                    Expanded(
-                      flex: 3,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          // IMMAGINE AUTO TOP-DOWN
-                          Opacity(
-                            opacity: 0.8,
-                            child: Image.asset(
-                              'assets/autoHomePage.png',
-                              fit: BoxFit.contain,
+                    // IMMAGINE AUTO CENTRALE (Più grande delle card)
+                    Center(
+                      child: SizedBox(
+                        width: 270, // Aumentata ulteriormente la dimensione dell'auto
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Opacity(
+                              opacity: 0.9,
+                              child: Image.asset(
+                                'assets/autoHomePage.png',
+                                fit: BoxFit.contain,
+                              ),
                             ),
-                          ),
-                          // BAGLIORI GOMME DINAMICI
-                          _buildGlowTire(top: 22, left: 6, usura: uAntSx),
-                          _buildGlowTire(top: 22, right: 6, usura: uAntDx),
-                          _buildGlowTire(bottom: 22, left: 6, usura: uPostSx),
-                          _buildGlowTire(bottom: 22, right: 6, usura: uPostDx),
-                        ],
+                            // BAGLIORI GOMME (Avvicinati alla carrozzeria per massima precisione)
+                            _buildGlowTire(top: 51, left: 95, usura: uAntSx),
+                            _buildGlowTire(top: 51, right: 98, usura: uAntDx),
+                            _buildGlowTire(bottom: 43, left: 95, usura: uPostSx),
+                            _buildGlowTire(bottom: 43, right: 98, usura: uPostDx),
+                          ],
+                        ),
                       ),
                     ),
-                    // Colonna DX
-                    Expanded(
-                      flex: 4,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _buildCardTire(context, 'Ant. dx', veicolo.antDx, uAntDx),
-                          _buildCardTire(context, 'Post. dx', veicolo.postDx, uPostDx),
-                        ],
-                      ),
-                    ),
+                    // CARD AI 4 ANGOLI (Posizionamento distanziato per evitare sovrapposizioni)
+                    Positioned(top: 22, left: 16, child: _buildCardTire(context, 'Ant. sx', veicolo.antSx, uAntSx)),
+                    Positioned(top: 22, right: 16, child: _buildCardTire(context, 'Ant. dx', veicolo.antDx, uAntDx)),
+                    Positioned(bottom: 22, left: 16, child: _buildCardTire(context, 'Post. sx', veicolo.postSx, uPostSx)),
+                    Positioned(bottom: 22, right: 16, child: _buildCardTire(context, 'Post. dx', veicolo.postDx, uPostDx)),
                   ],
                 ),
               ),
@@ -329,24 +283,59 @@ class HomePage extends StatelessWidget {
         );
       },
       child: Container(
-        padding: const EdgeInsets.all(8),
+        width: 82, 
+        height: 90, // Aumentata dimensione per ospitare il mini grafico
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         decoration: BoxDecoration(
-          color: const Color(0xFF1E1E1E),
+          color: const Color(0xFF1A1A1A).withOpacity(0.9),
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.white.withOpacity(0.12), width: 0.8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            )
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(pos, style: const TextStyle(color: Colors.grey, fontSize: 11)),
-            const SizedBox(height: 2),
+            Text(pos, style: const TextStyle(color: Colors.grey, fontSize: 9, fontWeight: FontWeight.w500)),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('${p.pressioneBase}', style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold, height: 1.1)),
+                const Text('bar', style: TextStyle(color: Colors.grey, fontSize: 8)),
+              ],
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('${p.pressioneBase} bar', style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
-                Icon(Icons.circle, size: 6, color: c),
+                Text('$usuraDinamica%', style: TextStyle(color: c, fontSize: 10, fontWeight: FontWeight.bold)),
+                // Mini grafico ad anello al posto del puntino
+                SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: Stack(
+                    children: [
+                      CircularProgressIndicator(
+                        value: 1.0,
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.redAccent.withOpacity(0.2)),
+                      ),
+                      CircularProgressIndicator(
+                        value: usuraDinamica / 100,
+                        strokeWidth: 2,
+                        backgroundColor: Colors.transparent,
+                        valueColor: AlwaysStoppedAnimation<Color>(c),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
-            Text('$usuraDinamica%', style: TextStyle(color: c, fontSize: 11, fontWeight: FontWeight.bold)),
           ],
         ),
       ),
@@ -355,23 +344,58 @@ class HomePage extends StatelessWidget {
 
   Widget _buildGlowTire({double? top, double? bottom, double? left, double? right, required int usura}) {
     Color c = usura > 70 ? Colors.greenAccent : (usura > 50 ? Colors.orangeAccent : Colors.redAccent);
+    bool isLeft = left != null;
     return Positioned(
       top: top, bottom: bottom, left: left, right: right,
-      child: Container(
-        width: 12,
-        height: 20,
-        decoration: BoxDecoration(
-          color: c.withOpacity(0.4),
-          borderRadius: BorderRadius.circular(4),
-          boxShadow: [
-            BoxShadow(
-              color: c.withOpacity(0.8),
-              blurRadius: 10,
-              spreadRadius: 2,
-            )
-          ],
-        ),
+      child: CustomPaint(
+        size: const Size(3, 24), // Molto più sottile e slanciato
+        painter: _TireGlowPainter(color: c, isLeft: isLeft),
       ),
     );
   }
+}
+
+class _TireGlowPainter extends CustomPainter {
+  final Color color;
+  final bool isLeft;
+
+  _TireGlowPainter({required this.color, required this.isLeft});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Paint paint = Paint()
+      ..color = color.withOpacity(0.5)
+      ..style = PaintingStyle.fill
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+
+    final Path path = Path();
+    double curveIntensity = 2.0;
+
+    if (isLeft) {
+      // Curva verso l'interno (destra) per le gomme di sinistra )
+      path.moveTo(0, 0);
+      path.quadraticBezierTo(curveIntensity, size.height / 2, 0, size.height);
+      path.lineTo(size.width, size.height);
+      path.quadraticBezierTo(size.width + curveIntensity, size.height / 2, size.width, 0);
+    } else {
+      // Curva verso l'interno (sinistra) per le gomme di destra (
+      path.moveTo(size.width, 0);
+      path.quadraticBezierTo(size.width - curveIntensity, size.height / 2, size.width, size.height);
+      path.lineTo(0, size.height);
+      path.quadraticBezierTo(-curveIntensity, size.height / 2, 0, 0);
+    }
+    path.close();
+
+    canvas.drawPath(path, paint);
+
+    // Nucleo più luminoso
+    final Paint corePaint = Paint()
+      ..color = color.withOpacity(0.8)
+      ..style = PaintingStyle.fill
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.5);
+    canvas.drawPath(path, corePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

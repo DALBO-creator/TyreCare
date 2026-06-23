@@ -27,10 +27,10 @@ class _SlotsPageState extends State<SlotsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1E1E1E),
+      backgroundColor: const Color(0xFF0A0A0A),
       appBar: AppBar(
         title: const Text('Disponibilità', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: const Color(0xFF0A0A0A),
         elevation: 0,
         centerTitle: true,
       ),
@@ -53,7 +53,7 @@ class _SlotsPageState extends State<SlotsPage> {
               return Container(
                 margin: const EdgeInsets.only(bottom: 8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF252525),
+                  color: const Color(0xFF161616),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isSelezionata ? Colors.redAccent.withOpacity(0.5) : Colors.transparent,
@@ -94,7 +94,7 @@ class _SlotsPageState extends State<SlotsPage> {
                   onTap: () => setState(() => _orarioSelezionato = index),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: isSelezionato ? Colors.redAccent : const Color(0xFF252525),
+                      color: isSelezionato ? Colors.redAccent : const Color(0xFF161616),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: isSelezionato ? Colors.transparent : Colors.grey[800]!,
@@ -130,7 +130,7 @@ class _SlotsPageState extends State<SlotsPage> {
                   width: 1.5
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: const Color(0xFF1E1E1E),
+                backgroundColor: const Color(0xFF0A0A0A),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
               child: Text(
@@ -152,7 +152,7 @@ class _SlotsPageState extends State<SlotsPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF2D2D2D),
+        backgroundColor: const Color(0xFF1A1A1A),
         title: const Row(
           children: [
             Icon(Icons.check_circle, color: Colors.greenAccent),

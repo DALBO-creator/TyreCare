@@ -14,10 +14,10 @@ class WalletPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1E1E1E),
+      backgroundColor: const Color(0xFF0A0A0A),
       appBar: AppBar(
         title: const Text('Wallet', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: const Color(0xFF0A0A0A),
         elevation: 0,
         centerTitle: true,
       ),
@@ -30,11 +30,11 @@ class WalletPage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xFF252525), // Stesso grigio scuro coerente delle card del mockup
+                color: const Color(0xFF161616).withOpacity(0.9), // Stesso grigio scuro coerente delle card del mockup
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: const Color(0xFF4A1519).withOpacity(0.4), // Un leggero accenno del tuo rosso scuro sul bordo
-                  width: 1,
+                  color: Colors.white.withOpacity(0.08), 
+                  width: 0.5,
                 ),
               ),
               child: Column(
@@ -98,8 +98,9 @@ class WalletPage extends StatelessWidget {
                       return Container(
                         margin: const EdgeInsets.only(bottom: 8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF252525),
+                          color: const Color(0xFF161616).withOpacity(0.9),
                           borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.white.withOpacity(0.08), width: 0.5),
                         ),
                         child: ListTile(
                           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),

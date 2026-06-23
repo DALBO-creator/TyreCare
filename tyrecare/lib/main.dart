@@ -18,7 +18,15 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'TyreCare',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(brightness: Brightness.dark, primarySwatch: Colors.red),
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        primarySwatch: Colors.red,
+        scaffoldBackgroundColor: const Color(0xFF0A0A0A),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF0A0A0A),
+          elevation: 0,
+        ),
+      ),
       home: const MainContainer(),
     );
   }
@@ -155,7 +163,7 @@ class _MainContainerState extends State<MainContainer> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _indiceSelezionato,
         type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: const Color(0xFF0A0A0A),
         selectedItemColor: Colors.redAccent,
         unselectedItemColor: Colors.grey,
         onTap: (index) => setState(() => _indiceSelezionato = index),
