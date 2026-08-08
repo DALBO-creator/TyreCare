@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'my_data_page.dart';
 import 'notifications_page.dart';
 import 'app_settings_page.dart';
