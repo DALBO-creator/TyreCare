@@ -6,7 +6,7 @@ import 'models.dart';
 import 'home_page.dart';
 import 'check_page.dart';
 import 'booking_page.dart';
-import 'wallet_page.dart';
+import 'history_page.dart';
 import 'profile_page.dart';
 import 'splash_page.dart';
 import 'login_page.dart';
@@ -160,111 +160,61 @@ class MainContainer extends StatefulWidget {
 
 class _MainContainerState extends State<MainContainer> {
   int _indiceSelezionato = 0;
-  double _cashbackGlobale = 150.00;
-  double _kmSimulatiDalloSlider = 0.0;
-
-  final List<Map<String, dynamic>> _transazioniWallet = [
-    {
-      'titolo': 'Cambio gomme stagionale',
-      'officina': 'PneusHub Travagliato',
-      'data': '14 Maggio 2026',
-      'importo': '+€ 15.00',
-      'tipo': 'guadagno',
-    },
-    {
-      'titolo': 'Controllo sicurezza & Bilanciatura',
-      'officina': 'Master Driver Brescia Ovest',
-      'data': '22 Aprile 2026',
-      'importo': '+€ 8.50',
-      'tipo': 'guadagno',
-    },
-    {
-      'titolo': 'Riscatto Buono Sconto',
-      'officina': 'Garage iperGomme Castegnato',
-      'data': '10 Marzo 2026',
-      'importo': '-€ 20.00',
-      'tipo': 'speso',
-    },
-  ];
-
   final List<Veicolo> _veicoliDisponibili = [
     Veicolo(
       nome: 'BMW Serie 3',
       anno: '2019',
+      targa: 'GA123BC',
       chilometriIniziali: '43800',
       immagineUrl:
           'https://images.pngimages.com/download/0b18f8e0d6da7e923e1e9a26372bf9dc.png',
       isPrincipale: true,
-      antSx: Pneumatico(posizione: 'antSx', pressioneBase: 2.4, usuraBase: 90, temperatura: 28),
-      antDx: Pneumatico(posizione: 'antDx', pressioneBase: 2.5, usuraBase: 95, temperatura: 29),
-      postSx: Pneumatico(posizione: 'postSx', pressioneBase: 2.3, usuraBase: 85, temperatura: 28),
-      postDx: Pneumatico(posizione: 'postDx', pressioneBase: 2.4, usuraBase: 92, temperatura: 28),
+      ultimoControllo: TyreInspection(id: 'inspection-1', date: DateTime(2026, 8, 2), workshopName: 'PneusHub Travagliato', mileage: 43800, note: 'Pressioni verificate. Nessuna anomalia rilevata.'),
+      antSx: Pneumatico(posizione: 'antSx', pressioneBase: 2.4, usuraBase: 90, temperatura: 28, marca: 'Pirelli', modello: 'Cinturato All Season', misura: '225/45 R17', dot: '1424', battistradaMm: 6.2, condizione: TyreCondition.excellent),
+      antDx: Pneumatico(posizione: 'antDx', pressioneBase: 2.5, usuraBase: 95, temperatura: 29, marca: 'Pirelli', modello: 'Cinturato All Season', misura: '225/45 R17', dot: '1424', battistradaMm: 6.0, condizione: TyreCondition.excellent),
+      postSx: Pneumatico(posizione: 'postSx', pressioneBase: 2.3, usuraBase: 85, temperatura: 28, marca: 'Pirelli', modello: 'Cinturato All Season', misura: '225/45 R17', dot: '1424', battistradaMm: 5.4, condizione: TyreCondition.excellent),
+      postDx: Pneumatico(posizione: 'postDx', pressioneBase: 2.4, usuraBase: 92, temperatura: 28, marca: 'Pirelli', modello: 'Cinturato All Season', misura: '225/45 R17', dot: '1424', battistradaMm: 5.5, condizione: TyreCondition.excellent),
     ),
     Veicolo(
       nome: 'Audi A3',
       anno: '2021',
+      targa: 'HD456EF',
       chilometriIniziali: '80000',
       immagineUrl:
           'https://images.pngimages.com/download/0b18f8e0d6da7e923e1e9a26372bf9dc.png',
       isPrincipale: false,
-      antSx: Pneumatico(posizione: 'antSx', pressioneBase: 2.2, usuraBase: 65, temperatura: 25),
-      antDx: Pneumatico(posizione: 'antDx', pressioneBase: 2.2, usuraBase: 67, temperatura: 25),
-      postSx: Pneumatico(posizione: 'postSx', pressioneBase: 2.1, usuraBase: 60, temperatura: 24),
-      postDx: Pneumatico(posizione: 'postDx', pressioneBase: 2.1, usuraBase: 62, temperatura: 24),
+      ultimoControllo: TyreInspection(id: 'inspection-2', date: DateTime(2026, 7, 18), workshopName: 'PneusHub Travagliato', mileage: 80000, note: 'Controllo stagionale completato.'),
+      antSx: Pneumatico(posizione: 'antSx', pressioneBase: 2.2, usuraBase: 65, temperatura: 25, marca: 'Michelin', modello: 'Primacy 4', misura: '205/55 R16', dot: '3522', battistradaMm: 3.4, condizione: TyreCondition.monitor),
+      antDx: Pneumatico(posizione: 'antDx', pressioneBase: 2.2, usuraBase: 67, temperatura: 25, marca: 'Michelin', modello: 'Primacy 4', misura: '205/55 R16', dot: '3522', battistradaMm: 3.3, condizione: TyreCondition.monitor),
+      postSx: Pneumatico(posizione: 'postSx', pressioneBase: 2.1, usuraBase: 60, temperatura: 24, marca: 'Michelin', modello: 'Primacy 4', misura: '205/55 R16', dot: '3522', battistradaMm: 3.1, condizione: TyreCondition.monitor),
+      postDx: Pneumatico(posizione: 'postDx', pressioneBase: 2.1, usuraBase: 62, temperatura: 24, marca: 'Michelin', modello: 'Primacy 4', misura: '205/55 R16', dot: '3522', battistradaMm: 3.2, condizione: TyreCondition.monitor),
     ),
   ];
 
   int _indiceAutoSelezionata = 0;
   Veicolo get _veicoloCorrente => _veicoliDisponibili[_indiceAutoSelezionata];
 
-  List<Widget> _ottieniPagine() {
-    return [
-      HomePage(
-        veicolo: _veicoloCorrente,
-        kmSlider: _kmSimulatiDalloSlider,
-        listaNomiVeicoli: _veicoliDisponibili.map((v) => v.nome).toList(),
-        transazioni: _transazioniWallet,
-        onAutoCambiata: (nuovoNome) {
-          setState(() {
-            _indiceAutoSelezionata =
-                _veicoliDisponibili.indexWhere((v) => v.nome == nuovoNome);
-            _kmSimulatiDalloSlider = 0.0;
-          });
-        },
-        onKmVariati: (nuoviKm) => setState(() => _kmSimulatiDalloSlider = nuoviKm),
-        onTabCambiato: (index) => setState(() => _indiceSelezionato = index),
-      ),
-      CheckPage(
-        veicoli: _veicoliDisponibili,
-        indicePrincipale: _indiceAutoSelezionata,
-        onVeicoloSelezionato: (index) {
-          setState(() {
-            _indiceAutoSelezionata = index;
-            _kmSimulatiDalloSlider = 0.0;
-          });
-        },
-      ),
-      BookingPage(
-        cashbackDisponibile: _cashbackGlobale,
-        onBookingConfirmed: (nuovaAttivita) {
-          setState(() {
-            _transazioniWallet.insert(0, {
-              'titolo': nuovaAttivita['titolo'],
-              'officina': nuovaAttivita['officina'],
-              'data': nuovaAttivita['data'],
-              'importo': nuovaAttivita['importo'],
-              'tipo': nuovaAttivita['tipo'],
-              'isDiscount': nuovaAttivita['isDiscount'] ?? false,
-            });
-            _cashbackGlobale += nuovaAttivita['cashbackValue'] as double;
-            if (_transazioniWallet.length > 5) _transazioniWallet.removeLast();
-          });
-        },
-      ),
-      WalletPage(saldoAttuale: _cashbackGlobale, transazioni: _transazioniWallet),
-      const ProfilePage(),
-    ];
-  }
+  final List<ServiceRecord> _storicoInterventi = const [
+    ServiceRecord(id: 'service-1', title: 'Cambio gomme stagionale', date: DateTime(2026, 5, 14), workshopName: 'PneusHub Travagliato', mileage: 43800, note: 'Controllo completo eseguito'),
+    ServiceRecord(id: 'service-2', title: 'Controllo sicurezza e bilanciatura', date: DateTime(2026, 4, 22), workshopName: 'Master Driver Brescia Ovest', mileage: 43200),
+  ];
+
+  List<Widget> _ottieniPagine() => [
+    HomePage(
+      veicolo: _veicoloCorrente,
+      veicoli: _veicoliDisponibili,
+      onAutoCambiata: (targa) => setState(() => _indiceAutoSelezionata = _veicoliDisponibili.indexWhere((item) => item.targa == targa)),
+      onTabCambiato: (index) => setState(() => _indiceSelezionato = index),
+    ),
+    CheckPage(
+      veicoli: _veicoliDisponibili,
+      indicePrincipale: _indiceAutoSelezionata,
+      onVeicoloSelezionato: (index) => setState(() => _indiceAutoSelezionata = index),
+    ),
+    BookingPage(cashbackDisponibile: 0, onBookingConfirmed: (_) {}),
+    HistoryPage(records: _storicoInterventi),
+    const ProfilePage(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -281,7 +231,7 @@ class _MainContainerState extends State<MainContainer> {
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.directions_car), label: 'Auto'),
           BottomNavigationBarItem(icon: Icon(Icons.calendar_month), label: 'Prenota'),
-          BottomNavigationBarItem(icon: Icon(Icons.account_balance_wallet), label: 'Wallet'),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Storico'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profilo'),
         ],
       ),

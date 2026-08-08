@@ -1,398 +1,116 @@
-// lib/home_page.dart
 import 'package:flutter/material.dart';
-import 'models.dart';
 import 'detail_page.dart';
+import 'models.dart';
 
 class HomePage extends StatelessWidget {
-  final Veicolo veicolo;
-  final double kmSlider;
-  final Function(double) onKmVariati;
-  final List<String> listaNomiVeicoli;
-  final List<Map<String, dynamic>> transazioni;
-  final Function(String) onAutoCambiata;
-  final Function(int) onTabCambiato;
-
   const HomePage({
     super.key,
     required this.veicolo,
-    required this.kmSlider,
-    required this.onKmVariati,
-    required this.listaNomiVeicoli,
-    required this.transazioni,
+    required this.veicoli,
     required this.onAutoCambiata,
     required this.onTabCambiato,
   });
 
+  final Veicolo veicolo;
+  final List<Veicolo> veicoli;
+  final ValueChanged<String> onAutoCambiata;
+  final ValueChanged<int> onTabCambiato;
+
   @override
   Widget build(BuildContext context) {
-    // Calcolo usura media per il grafico circolare ad anello
-    int uAntSx = veicolo.antSx.calcolaUsuraDinamica(kmSlider);
-    int uAntDx = veicolo.antDx.calcolaUsuraDinamica(kmSlider);
-    int uPostSx = veicolo.postSx.calcolaUsuraDinamica(kmSlider);
-    int uPostDx = veicolo.postDx.calcolaUsuraDinamica(kmSlider);
-    int mediaUsura = ((uAntSx + uAntDx + uPostSx + uPostDx) / 4).round();
-
-    Color coloreStatoGenerale = mediaUsura > 70 
-        ? Colors.greenAccent 
-        : (mediaUsura > 50 ? Colors.orangeAccent : Colors.redAccent);
+    final inspection = veicolo.ultimoControllo;
+    final tyres = veicolo.pneumatici;
+    final minTread = tyres.map((tyre) => tyre.battistradaMm).reduce((a, b) => a < b ? a : b);
+    final condition = _conditionFor(minTread);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
       appBar: AppBar(
         title: DropdownButtonHideUnderline(
           child: DropdownButton<String>(
-            value: veicolo.nome,
-            dropdownColor: const Color(0xFF1A1A1A),
-            icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey, size: 20),
-            isDense: true,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
-            items: listaNomiVeicoli.map((String nome) {
-              return DropdownMenuItem<String>(
-                value: nome,
-                child: Row(
-                  children: [
-                    const Text('La tua ', style: TextStyle(fontWeight: FontWeight.normal, color: Colors.white)),
-                    Text(nome),
-                  ],
-                ),
-              );
-            }).toList(),
-            onChanged: (nuovoNome) {
-              if (nuovoNome != null) onAutoCambiata(nuovoNome);
+            value: veicolo.targa,
+            dropdownColor: const Color(0xFF161616),
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+            items: veicoli.map((item) => DropdownMenuItem(value: item.targa, child: Text('${item.nome} · ${item.targa}'))).toList(),
+            onChanged: (value) {
+              if (value != null) onAutoCambiata(value);
             },
           ),
         ),
-        backgroundColor: const Color(0xFF0A0A0A),
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none_rounded, color: Colors.white),
-            onPressed: () {},
-          )
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Text('Stato certificato', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 4),
+          Text(
+            inspection == null ? 'In attesa del primo controllo in officina' : 'Aggiornato il ${_date(inspection.date)} da ${inspection.workshopName}',
+            style: const TextStyle(color: Colors.grey),
+          ),
+          const SizedBox(height: 16),
+          _statusCard(context, minTread, condition, inspection),
+          const SizedBox(height: 24),
+          const Text('Pneumatici', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          const SizedBox(height: 10),
+          ...tyres.map((tyre) => _tyreTile(tyre)),
+          const SizedBox(height: 20),
+          FilledButton.icon(
+            onPressed: () => onTabCambiato(2),
+            icon: const Icon(Icons.calendar_month),
+            label: const Text('PRENOTA UN SERVIZIO'),
+          ),
+          TextButton.icon(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => DetailPage(
+                  veicolo: veicolo,
+                  posizioneIniziale: 'ant. sx',
+                  kmSlider: 0,
+                  transazioni: const [],
+                ),
+              ),
+            ),
+            icon: const Icon(Icons.description_outlined),
+            label: const Text('Visualizza scheda tecnica'),
+          ),
         ],
       ),
-      body: SafeArea(
+    );
+  }
+
+  Widget _statusCard(BuildContext context, double tread, _TyreStatus status, TyreInspection? inspection) => Card(
+        color: const Color(0xFF161616),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0), // Padding verticale azzerato per alzare tutto
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // 1. LOGO TYRECARE (Sostituito al modello 3D)
-              SizedBox(
-                height: 120, // Altezza intermedia per bilanciare lo spazio
-                child: Center(
-                  child: Image.asset(
-                    'assets/logoTyreCare.png',
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 6), // Ridotto da 8 a 6
-
-              // 2. SLIDER DEI CHILOMETRI INTEGRATO CON CURA
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF161616).withValues(alpha: 0.9),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.08), width: 0.5),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Simulazione chilometri:', style: TextStyle(color: Colors.grey, fontSize: 11)),
-                          Text('${kmSlider.toInt()} km', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: Slider(
-                        value: kmSlider,
-                        min: 0,
-                        max: 15000,
-                        divisions: 150,
-                        activeColor: Colors.redAccent,
-                        inactiveColor: const Color(0xFF2A2A2A),
-                        onChanged: (newValue) => onKmVariati(newValue),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 6), // Ridotto da 8 a 6
-
-            // 3. STATO GENERALE PNEUMATICI (MOCKUP STILE ANTEPRIMA)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Ridotto padding verticale da 12 a 8
-              decoration: BoxDecoration(
-                color: const Color(0xFF161616).withValues(alpha: 0.9),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.08), width: 0.5),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Stato generale pneumatici', style: TextStyle(color: Colors.grey, fontSize: 12)), // Ridotto da 13 a 12
-                          const SizedBox(height: 2), // Ridotto da 4 a 2
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.baseline,
-                            textBaseline: TextBaseline.alphabetic,
-                            children: [
-                              Text('$mediaUsura', style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white)), // Ridotto da 34 a 32
-                              const Text('%', style: TextStyle(fontSize: 16, color: Colors.white)),
-                            ],
-                          ),
-                          const SizedBox(height: 0), // Ridotto da 2 a 0
-                          Text(
-                            mediaUsura > 70 ? 'Ottimo stato' : (mediaUsura > 50 ? 'Stato medio' : 'Urgente controllo'), 
-                            style: TextStyle(color: coloreStatoGenerale, fontWeight: FontWeight.bold, fontSize: 12) // Ridotto da 13 a 12
-                          ),
-                        ],
-                      ),
-                      // Grafico ad anello circolare nativo
-                      SizedBox(
-                        width: 55, // Ridotto da 65 a 55
-                        height: 55,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            CircularProgressIndicator(
-                              value: 1.0, 
-                              strokeWidth: 6, // Ridotto da 7 a 6
-                              valueColor: const AlwaysStoppedAnimation<Color>(Colors.redAccent),
-                            ),
-                            CircularProgressIndicator(
-                              value: mediaUsura / 100,
-                              strokeWidth: 6, // Ridotto da 7 a 6
-                              backgroundColor: Colors.transparent,
-                              valueColor: AlwaysStoppedAnimation<Color>(coloreStatoGenerale),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 6.0), // Ridotto da 10 a 6
-                    child: Divider(color: Color(0xFF1F1F1F), height: 1),
-                  ),
-                  // INFO CONTROLLI INTEGRATE NELLA CARD
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Ultimo controllo', style: TextStyle(color: Colors.grey, fontSize: 10)),
-                          const Text('12 Marzo 2024', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500)), // Ridotto da 12 a 11
-                        ],
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Prossimo controllo', style: TextStyle(color: Colors.grey, fontSize: 10)),
-                          const Text('tra 1.200 km', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500)), // Ridotto da 12 a 11
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8), // Ridotto da 12 a 8
-
-            // 4. PLANCIA TOP-DOWN DIAGNOSTICA (Layout a Stack per angoli e auto grande)
-            Expanded(
-              flex: 6, // Aumentato da 5 a 6 per dare più spazio
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0A0A0A),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Stack(
-                  children: [
-                    // IMMAGINE AUTO CENTRALE (Più grande delle card)
-                    Center(
-                      child: SizedBox(
-                        width: 270, // Aumentata ulteriormente la dimensione dell'auto
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Opacity(
-                              opacity: 0.9,
-                              child: Image.asset(
-                                'assets/autoHomePage.png',
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                            // BAGLIORI GOMME (Avvicinati alla carrozzeria per massima precisione)
-                            _buildGlowTire(top: 51, left: 95, usura: uAntSx),
-                            _buildGlowTire(top: 51, right: 98, usura: uAntDx),
-                            _buildGlowTire(bottom: 43, left: 95, usura: uPostSx),
-                            _buildGlowTire(bottom: 43, right: 98, usura: uPostDx),
-                          ],
-                        ),
-                      ),
-                    ),
-                    // CARD AI 4 ANGOLI (Posizionamento ottimizzato per evitare sovrapposizioni)
-                    Positioned(top: 10, left: 16, child: _buildCardTire(context, 'Ant. sx', veicolo.antSx, uAntSx)),
-                    Positioned(top: 10, right: 16, child: _buildCardTire(context, 'Ant. dx', veicolo.antDx, uAntDx)),
-                    Positioned(bottom: 10, left: 16, child: _buildCardTire(context, 'Post. sx', veicolo.postSx, uPostSx)),
-                    Positioned(bottom: 10, right: 16, child: _buildCardTire(context, 'Post. dx', veicolo.postDx, uPostDx)),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // POLISHED ACTION BUTTON RED
-            ElevatedButton(
-              onPressed: () => onTabCambiato(2),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFC62828),
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              child: const Text('PRENOTA UN CONTROLLO', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 0.5)),
-            )
-          ],
+          padding: const EdgeInsets.all(20),
+          child: Row(children: [
+            Icon(status.icon, color: status.color, size: 42),
+            const SizedBox(width: 16),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(status.label, style: TextStyle(color: status.color, fontWeight: FontWeight.bold, fontSize: 18)),
+              const SizedBox(height: 4),
+              Text('Battistrada minimo rilevato: ${tread.toStringAsFixed(1)} mm'),
+              if (inspection != null && inspection.note.isNotEmpty) ...[const SizedBox(height: 6), Text(inspection.note, style: const TextStyle(color: Colors.grey))],
+            ])),
+          ]),
         ),
-      )),
-    );
-  }
+      );
 
-  Widget _buildCardTire(BuildContext context, String pos, Pneumatico p, int usuraDinamica) {
-    Color c = usuraDinamica > 70 ? Colors.greenAccent : (usuraDinamica > 50 ? Colors.orangeAccent : Colors.redAccent);
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => DetailPage(veicolo: veicolo, posizioneIniziale: pos, kmSlider: kmSlider, transazioni: transazioni)),
-        );
-      },
-      child: Container(
-        width: 82, 
-        height: 84, // Ridotta altezza da 90 a 84 per evitare sovrapposizioni verticali
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1A1A1A).withValues(alpha: 0.9),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.12), width: 0.8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            )
-          ],
+  Widget _tyreTile(Pneumatico tyre) => Card(
+        color: const Color(0xFF161616),
+        child: ListTile(
+          leading: Icon(Icons.tire_repair, color: _color(tyre.condizione)),
+          title: Text(_position(tyre.posizione)),
+          subtitle: Text('${tyre.marca} ${tyre.modello}\n${tyre.misura} · ${tyre.battistradaMm.toStringAsFixed(1)} mm · ${tyre.pressioneBase.toStringAsFixed(1)} bar'),
+          isThreeLine: true,
+          trailing: Text(_conditionLabel(tyre.condizione), style: TextStyle(color: _color(tyre.condizione), fontWeight: FontWeight.bold)),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(pos, style: const TextStyle(color: Colors.grey, fontSize: 9, fontWeight: FontWeight.w500)),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('${p.pressioneBase}', style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold, height: 1.1)),
-                const Text('bar', style: TextStyle(color: Colors.grey, fontSize: 8)),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('$usuraDinamica%', style: TextStyle(color: c, fontSize: 10, fontWeight: FontWeight.bold)),
-                // Mini grafico ad anello al posto del puntino
-                SizedBox(
-                  width: 14,
-                  height: 14,
-                  child: Stack(
-                    children: [
-                      CircularProgressIndicator(
-                        value: 1.0,
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.redAccent.withValues(alpha: 0.2)),
-                      ),
-                      CircularProgressIndicator(
-                        value: usuraDinamica / 100,
-                        strokeWidth: 2,
-                        backgroundColor: Colors.transparent,
-                        valueColor: AlwaysStoppedAnimation<Color>(c),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+      );
 
-  Widget _buildGlowTire({double? top, double? bottom, double? left, double? right, required int usura}) {
-    Color c = usura > 70 ? Colors.greenAccent : (usura > 50 ? Colors.orangeAccent : Colors.redAccent);
-    bool isLeft = left != null;
-    return Positioned(
-      top: top, bottom: bottom, left: left, right: right,
-      child: CustomPaint(
-        size: const Size(3, 24), // Molto più sottile e slanciato
-        painter: _TireGlowPainter(color: c, isLeft: isLeft),
-      ),
-    );
-  }
+  _TyreStatus _conditionFor(double tread) => tread >= 5 ? const _TyreStatus('Ottimo stato', Colors.greenAccent, Icons.verified_outlined) : tread >= 3 ? const _TyreStatus('Da monitorare', Colors.orangeAccent, Icons.visibility_outlined) : const _TyreStatus('Verifica consigliata', Colors.redAccent, Icons.warning_amber_rounded);
+  Color _color(TyreCondition value) => value == TyreCondition.excellent ? Colors.greenAccent : value == TyreCondition.monitor ? Colors.orangeAccent : Colors.redAccent;
+  String _conditionLabel(TyreCondition value) => value == TyreCondition.excellent ? 'Ottimo' : value == TyreCondition.monitor ? 'Monitorare' : 'Attenzione';
+  String _position(String value) => {'antSx': 'Anteriore sinistra', 'antDx': 'Anteriore destra', 'postSx': 'Posteriore sinistra', 'postDx': 'Posteriore destra'}[value] ?? value;
+  String _date(DateTime date) => '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
 }
 
-class _TireGlowPainter extends CustomPainter {
-  final Color color;
-  final bool isLeft;
-
-  _TireGlowPainter({required this.color, required this.isLeft});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Paint paint = Paint()
-      ..color = color.withValues(alpha: 0.5)
-      ..style = PaintingStyle.fill
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
-
-    final Path path = Path();
-    double curveIntensity = 2.0;
-
-    if (isLeft) {
-      // Curva verso l'interno (destra) per le gomme di sinistra )
-      path.moveTo(0, 0);
-      path.quadraticBezierTo(curveIntensity, size.height / 2, 0, size.height);
-      path.lineTo(size.width, size.height);
-      path.quadraticBezierTo(size.width + curveIntensity, size.height / 2, size.width, 0);
-    } else {
-      // Curva verso l'interno (sinistra) per le gomme di destra (
-      path.moveTo(size.width, 0);
-      path.quadraticBezierTo(size.width - curveIntensity, size.height / 2, size.width, size.height);
-      path.lineTo(0, size.height);
-      path.quadraticBezierTo(-curveIntensity, size.height / 2, 0, 0);
-    }
-    path.close();
-
-    canvas.drawPath(path, paint);
-
-    // Nucleo più luminoso
-    final Paint corePaint = Paint()
-      ..color = color.withValues(alpha: 0.8)
-      ..style = PaintingStyle.fill
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.5);
-    canvas.drawPath(path, corePaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
+class _TyreStatus { const _TyreStatus(this.label, this.color, this.icon); final String label; final Color color; final IconData icon; }

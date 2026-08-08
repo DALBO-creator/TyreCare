@@ -1,60 +1,99 @@
-// lib/models.dart
-class Pneumatico {
-  final String posizione;
-  final double pressioneBase;
-  final int usuraBase;
-  final int temperatura;
+enum TyreCondition { excellent, monitor, attention, replace }
 
-  Pneumatico({
+enum AppointmentStatus { requested, confirmed, quoteAvailable, completed, cancelled }
+
+class Pneumatico {
+  const Pneumatico({
     required this.posizione,
     required this.pressioneBase,
     required this.usuraBase,
     required this.temperatura,
+    this.marca = '',
+    this.modello = '',
+    this.misura = '',
+    this.dot = '',
+    this.battistradaMm = 0,
+    this.condizione = TyreCondition.excellent,
   });
 
-  // Calcola l'usura dinamica in base alla simulazione dello slider
-  int calcolaUsuraDinamica(double kmSimulati) {
-    double consumo = kmSimulati / 150; 
-    int usuraAttuale = usuraBase - consumo.toInt();
-    if (usuraAttuale < 10) return 10;
-    if (usuraAttuale > 100) return 100;
-    return usuraAttuale;
-  }
+  final String posizione;
+  final double pressioneBase;
+  final int usuraBase;
+  final int temperatura;
+  final String marca;
+  final String modello;
+  final String misura;
+  final String dot;
+  final double battistradaMm;
+  final TyreCondition condizione;
+
+  // Kept for backward compatibility while legacy pages are migrated.
+  int calcolaUsuraDinamica(double _) => usuraBase.clamp(10, 100).toInt();
 }
 
 class Veicolo {
+  const Veicolo({
+    required this.nome,
+    required this.anno,
+    required this.chilometriIniziali,
+    required this.immagineUrl,
+    this.targa = '',
+    required this.antSx,
+    required this.antDx,
+    required this.postSx,
+    required this.postDx,
+    this.isPrincipale = false,
+    this.ultimoControllo,
+  });
+
   final String nome;
   final String anno;
   final String chilometriIniziali;
   final String immagineUrl;
+  final String targa;
   final bool isPrincipale;
   final Pneumatico antSx;
   final Pneumatico antDx;
   final Pneumatico postSx;
   final Pneumatico postDx;
+  final TyreInspection? ultimoControllo;
 
-  Veicolo({
-    required this.nome,
-    required this.anno,
-    required this.chilometriIniziali,
-    required this.immagineUrl,
-    this.isPrincipale = false,
-    required this.antSx,
-    required this.antDx,
-    required this.postSx,
-    required this.postDx,
+  List<Pneumatico> get pneumatici => [antSx, antDx, postSx, postDx];
+  int chilometriTotali(double _) => int.tryParse(chilometriIniziali) ?? 0;
+  int mediaUsuraGenerale(double _) =>
+      (pneumatici.map((item) => item.usuraBase).reduce((a, b) => a + b) / 4).round();
+}
+
+class TyreInspection {
+  const TyreInspection({
+    required this.id,
+    required this.date,
+    required this.workshopName,
+    required this.mileage,
+    required this.note,
   });
 
-  int chilometriTotali(double kmSimulati) {
-    int base = int.tryParse(chilometriIniziali) ?? 0;
-    return base + kmSimulati.toInt();
-  }
+  final String id;
+  final DateTime date;
+  final String workshopName;
+  final int mileage;
+  final String note;
+}
 
-  int mediaUsuraGenerale(double kmSimulati) {
-    int usuraAntSx = antSx.calcolaUsuraDinamica(kmSimulati);
-    int usuraAntDx = antDx.calcolaUsuraDinamica(kmSimulati);
-    int usuraPostSx = postSx.calcolaUsuraDinamica(kmSimulati);
-    int usuraPostDx = postDx.calcolaUsuraDinamica(kmSimulati);
-    return ((usuraAntSx + usuraAntDx + usuraPostSx + usuraPostDx) / 4).round();
-  }
+class ServiceRecord {
+  const ServiceRecord({
+    required this.id,
+    required this.title,
+    required this.date,
+    required this.workshopName,
+    required this.mileage,
+    this.note = '',
+  });
+
+  final String id;
+  final String title;
+  final DateTime date;
+  final String workshopName;
+  final int mileage;
+  final String note;
 }
