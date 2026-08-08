@@ -5,25 +5,31 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'models.dart';
 import 'home_page.dart';
 import 'check_page.dart';
-import 'booking_page.dart_page.dart';
+import 'booking_page.dart';
+import 'wallet_page.dart';
 import 'profile_page.dart';
 import 'splash_page.dart';
 import 'login_page.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Nota: Firebase richiede la configurazione specifica per piattaforma (google-services.json / GoogleService-Info.plist)
-  // Se non l'hai ancora fatta, questa riga darà errore.
+
+  var isFirebaseAvailable = true;
   try {
     await Firebase.initializeApp();
-  } catch (e) {
-    print("Firebase non inizializzato: assicurati di aver aggiunto i file di configurazione.");
+  } catch (_) {
+    // The UI stays usable and shows an actionable message instead of creating
+    // FirebaseAuth instances without a configured Firebase app.
+    isFirebaseAvailable = false;
   }
-  runApp(const MyApp());
+
+  runApp(MyApp(isFirebaseAvailable: isFirebaseAvailable));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, this.isFirebaseAvailable = true});
+
+  final bool isFirebaseAvailable;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +45,42 @@ class MyApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
-      home: const AuthWrapper(),
+      home: isFirebaseAvailable
+          ? const AuthWrapper()
+          : const FirebaseConfigurationPage(),
+    );
+  }
+}
+
+class FirebaseConfigurationPage extends StatelessWidget {
+  const FirebaseConfigurationPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.cloud_off_outlined, color: Colors.redAccent, size: 48),
+              SizedBox(height: 16),
+              Text(
+                'Configurazione Firebase non disponibile',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Verifica i file di configurazione Firebase per la piattaforma in uso e riprova.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

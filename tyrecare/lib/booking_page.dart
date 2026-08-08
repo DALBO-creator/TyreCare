@@ -70,7 +70,8 @@ class _BookingPageState extends State<BookingPage> {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {},
+          tooltip: 'Indietro',
+          onPressed: () => Navigator.maybePop(context),
         ),
       ),
       body: Padding(
