@@ -18,8 +18,8 @@ Future<void> main() async {
   try {
     await Firebase.initializeApp();
   } catch (_) {
-    // The UI stays usable and shows an actionable message instead of creating
-    // FirebaseAuth instances without a configured Firebase app.
+    // Firebase is optional for the local demo and for platforms that have not
+    // yet been configured through FlutterFire.
     isFirebaseAvailable = false;
   }
 
@@ -57,25 +57,48 @@ class FirebaseConfigurationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Center(
         child: Padding(
-          padding: EdgeInsets.all(24),
+          padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.cloud_off_outlined, color: Colors.redAccent, size: 48),
-              SizedBox(height: 16),
-              Text(
+              const Icon(
+                Icons.cloud_off_outlined,
+                color: Colors.redAccent,
+                size: 48,
+              ),
+              const SizedBox(height: 16),
+              const Text(
                 'Configurazione Firebase non disponibile',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 8),
-              Text(
-                'Verifica i file di configurazione Firebase per la piattaforma in uso e riprova.',
+              const SizedBox(height: 8),
+              const Text(
+                'L’accesso con account richiede Firebase per questa piattaforma.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (_) => const MainContainer()),
+                    );
+                  },
+                  icon: const Icon(Icons.visibility_outlined),
+                  label: const Text('CONTINUA IN MODALITÀ DEMO'),
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Configura Firebase con FlutterFire per abilitare accesso e registrazione.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey, fontSize: 12),
               ),
             ],
           ),
@@ -94,13 +117,11 @@ class AuthWrapper extends StatelessWidget {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator(color: Colors.redAccent)));
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator(color: Colors.redAccent)),
+          );
         }
-        if (snapshot.hasData) {
-          return const Initializer();
-        } else {
-          return const LoginPage();
-        }
+        return snapshot.hasData ? const Initializer() : const LoginPage();
       },
     );
   }
@@ -121,13 +142,9 @@ class _InitializerState extends State<Initializer> {
     final user = FirebaseAuth.instance.currentUser;
     if (_showSplash) {
       return SplashPage(
-        nomeUtente: user?.displayName ?? user?.email?.split('@')[0] ?? "Utente",
-        modelloAuto: "BMW Serie 3", // Modello principale
-        onFinish: () {
-          setState(() {
-            _showSplash = false;
-          });
-        },
+        nomeUtente: user?.displayName ?? user?.email?.split('@')[0] ?? 'Utente',
+        modelloAuto: 'BMW Serie 3',
+        onFinish: () => setState(() => _showSplash = false),
       );
     }
     return const MainContainer();
@@ -143,7 +160,7 @@ class MainContainer extends StatefulWidget {
 
 class _MainContainerState extends State<MainContainer> {
   int _indiceSelezionato = 0;
-  double _cashbackGlobale = 150.00; 
+  double _cashbackGlobale = 150.00;
   double _kmSimulatiDalloSlider = 0.0;
 
   final List<Map<String, dynamic>> _transazioniWallet = [
@@ -152,21 +169,21 @@ class _MainContainerState extends State<MainContainer> {
       'officina': 'PneusHub Travagliato',
       'data': '14 Maggio 2026',
       'importo': '+€ 15.00',
-      'tipo': 'guadagno'
+      'tipo': 'guadagno',
     },
     {
       'titolo': 'Controllo sicurezza & Bilanciatura',
       'officina': 'Master Driver Brescia Ovest',
       'data': '22 Aprile 2026',
       'importo': '+€ 8.50',
-      'tipo': 'guadagno'
+      'tipo': 'guadagno',
     },
     {
       'titolo': 'Riscatto Buono Sconto',
       'officina': 'Garage iperGomme Castegnato',
       'data': '10 Marzo 2026',
       'importo': '-€ 20.00',
-      'tipo': 'speso'
+      'tipo': 'speso',
     },
   ];
 
@@ -175,7 +192,8 @@ class _MainContainerState extends State<MainContainer> {
       nome: 'BMW Serie 3',
       anno: '2019',
       chilometriIniziali: '43800',
-      immagineUrl: 'https://images.pngimages.com/download/0b18f8e0d6da7e923e1e9a26372bf9dc.png',
+      immagineUrl:
+          'https://images.pngimages.com/download/0b18f8e0d6da7e923e1e9a26372bf9dc.png',
       isPrincipale: true,
       antSx: Pneumatico(posizione: 'antSx', pressioneBase: 2.4, usuraBase: 90, temperatura: 28),
       antDx: Pneumatico(posizione: 'antDx', pressioneBase: 2.5, usuraBase: 95, temperatura: 29),
@@ -186,7 +204,8 @@ class _MainContainerState extends State<MainContainer> {
       nome: 'Audi A3',
       anno: '2021',
       chilometriIniziali: '80000',
-      immagineUrl: 'https://images.pngimages.com/download/0b18f8e0d6da7e923e1e9a26372bf9dc.png',
+      immagineUrl:
+          'https://images.pngimages.com/download/0b18f8e0d6da7e923e1e9a26372bf9dc.png',
       isPrincipale: false,
       antSx: Pneumatico(posizione: 'antSx', pressioneBase: 2.2, usuraBase: 65, temperatura: 25),
       antDx: Pneumatico(posizione: 'antDx', pressioneBase: 2.2, usuraBase: 67, temperatura: 25),
@@ -207,20 +226,13 @@ class _MainContainerState extends State<MainContainer> {
         transazioni: _transazioniWallet,
         onAutoCambiata: (nuovoNome) {
           setState(() {
-            _indiceAutoSelezionata = _veicoliDisponibili.indexWhere((v) => v.nome == nuovoNome);
-            _kmSimulatiDalloSlider = 0.0; // Resettiamo la simulazione se cambia auto
+            _indiceAutoSelezionata =
+                _veicoliDisponibili.indexWhere((v) => v.nome == nuovoNome);
+            _kmSimulatiDalloSlider = 0.0;
           });
         },
-        onKmVariati: (nuoviKm) {
-          setState(() {
-            _kmSimulatiDalloSlider = nuoviKm;
-          });
-        },
-        onTabCambiato: (index) {
-          setState(() {
-            _indiceSelezionato = index;
-          });
-        },
+        onKmVariati: (nuoviKm) => setState(() => _kmSimulatiDalloSlider = nuoviKm),
+        onTabCambiato: (index) => setState(() => _indiceSelezionato = index),
       ),
       CheckPage(
         veicoli: _veicoliDisponibili,
@@ -228,10 +240,10 @@ class _MainContainerState extends State<MainContainer> {
         onVeicoloSelezionato: (index) {
           setState(() {
             _indiceAutoSelezionata = index;
-            _kmSimulatiDalloSlider = 0.0; // Reset simulazione
+            _kmSimulatiDalloSlider = 0.0;
           });
         },
-      ), 
+      ),
       BookingPage(
         cashbackDisponibile: _cashbackGlobale,
         onBookingConfirmed: (nuovaAttivita) {
@@ -245,16 +257,11 @@ class _MainContainerState extends State<MainContainer> {
               'isDiscount': nuovaAttivita['isDiscount'] ?? false,
             });
             _cashbackGlobale += nuovaAttivita['cashbackValue'] as double;
-            if (_transazioniWallet.length > 5) {
-              _transazioniWallet.removeLast();
-            }
+            if (_transazioniWallet.length > 5) _transazioniWallet.removeLast();
           });
         },
       ),
-      WalletPage(
-        saldoAttuale: _cashbackGlobale,
-        transazioni: _transazioniWallet,
-      ),
+      WalletPage(saldoAttuale: _cashbackGlobale, transazioni: _transazioniWallet),
       const ProfilePage(),
     ];
   }
