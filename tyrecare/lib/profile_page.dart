@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_theme.dart';
 import 'app_settings_page.dart';
 import 'help_support_page.dart';
 import 'my_data_page.dart';
@@ -98,7 +99,7 @@ class ProfilePage extends StatelessWidget {
       );
 
   Widget _section(String title, List<Widget> children) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(title, style: const TextStyle(color: Colors.grey, fontSize: 13, fontWeight: FontWeight.bold)),
+        PremiumSectionTitle(title),
         const SizedBox(height: 8),
         Card(color: const Color(0xFF161616), child: Column(children: children)),
       ]);

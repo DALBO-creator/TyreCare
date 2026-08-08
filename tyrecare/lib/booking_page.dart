@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_theme.dart';
 import 'models.dart';
 
 class BookingPage extends StatefulWidget {
@@ -45,7 +46,9 @@ class _BookingPageState extends State<BookingPage> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Text('Invia una richiesta alla tua officina. La data sarà confermata dall’operatore.', style: TextStyle(color: Colors.grey)),
+          const Text('Prenota in pochi passaggi', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
+          const SizedBox(height: 6),
+          const Text('Invia una richiesta alla tua officina. La data sarà confermata dall’operatore.', style: TextStyle(color: AppColors.textMuted)),
           const SizedBox(height: 24),
           _section('Officina associata', Card(color: const Color(0xFF161616), child: ListTile(leading: const Icon(Icons.storefront_outlined, color: Colors.redAccent), title: Text(_workshop), subtitle: const Text('Officina affiliata TyreCare')))),
           _section('Servizio richiesto', DropdownButtonFormField<String>(
@@ -84,9 +87,9 @@ class _BookingPageState extends State<BookingPage> {
 
   Widget _section(String title, Widget child) => Padding(
         padding: const EdgeInsets.only(bottom: 20),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(fontWeight: FontWeight.bold)), const SizedBox(height: 8), child]),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [PremiumSectionTitle(title), const SizedBox(height: 8), child]),
       );
-  InputDecoration _decoration() => InputDecoration(filled: true, fillColor: const Color(0xFF161616), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none));
+  InputDecoration _decoration() => const InputDecoration();
   Future<void> _pickDate() async {
     final result = await showDatePicker(context: context, firstDate: DateTime.now(), lastDate: DateTime.now().add(const Duration(days: 180)), initialDate: _date ?? DateTime.now().add(const Duration(days: 1)));
     if (result != null) setState(() { _date = result; _time = null; });

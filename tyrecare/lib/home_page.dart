@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_theme.dart';
 import 'detail_page.dart';
 import 'models.dart';
 
@@ -40,8 +41,12 @@ class HomePage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Text('Stato certificato', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 4),
+          const Text('TYRECARE', style: TextStyle(color: Color(0xFFFF646A), fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 1.6)),
+          const SizedBox(height: 6),
+          Text('La tua mobilità,\nsempre sotto controllo.', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800, height: 1.1)),
+          const SizedBox(height: 22),
+          const PremiumSectionTitle('Stato certificato'),
+          const SizedBox(height: 8),
           Text(
             inspection == null ? 'In attesa del primo controllo in officina' : 'Aggiornato il ${_date(inspection.date)} da ${inspection.workshopName}',
             style: const TextStyle(color: Colors.grey),
