@@ -49,7 +49,7 @@ class _BookingPageState extends State<BookingPage> {
           const SizedBox(height: 24),
           _section('Officina associata', Card(color: const Color(0xFF161616), child: ListTile(leading: const Icon(Icons.storefront_outlined, color: Colors.redAccent), title: Text(_workshop), subtitle: const Text('Officina affiliata TyreCare')))),
           _section('Servizio richiesto', DropdownButtonFormField<String>(
-            value: _service,
+            initialValue: _service,
             dropdownColor: const Color(0xFF161616),
             items: _services.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
             onChanged: (value) => setState(() => _service = value!),
