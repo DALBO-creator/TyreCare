@@ -87,7 +87,7 @@ class FirebaseConfigurationPage extends StatelessWidget {
                 child: ElevatedButton.icon(
                   onPressed: () {
                     Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (_) => const MainContainer()),
+                      MaterialPageRoute(builder: (_) => const MainContainer(isDemo: true)),
                     );
                   },
                   icon: const Icon(Icons.visibility_outlined),
@@ -152,7 +152,9 @@ class _InitializerState extends State<Initializer> {
 }
 
 class MainContainer extends StatefulWidget {
-  const MainContainer({super.key});
+  const MainContainer({super.key, this.isDemo = false});
+
+  final bool isDemo;
 
   @override
   State<MainContainer> createState() => _MainContainerState();
@@ -213,7 +215,7 @@ class _MainContainerState extends State<MainContainer> {
     ),
     BookingPage(cashbackDisponibile: 0, onBookingConfirmed: (_) {}),
     HistoryPage(records: _storicoInterventi),
-    const ProfilePage(),
+    ProfilePage(isDemo: widget.isDemo),
   ];
 
   @override
