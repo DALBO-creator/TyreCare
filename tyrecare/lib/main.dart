@@ -194,7 +194,7 @@ class _MainContainerState extends State<MainContainer> {
   int _indiceAutoSelezionata = 0;
   Veicolo get _veicoloCorrente => _veicoliDisponibili[_indiceAutoSelezionata];
 
-  final List<ServiceRecord> _storicoInterventi = const [
+  final List<ServiceRecord> _storicoInterventi = [
     ServiceRecord(id: 'service-1', title: 'Cambio gomme stagionale', date: DateTime(2026, 5, 14), workshopName: 'PneusHub Travagliato', mileage: 43800, note: 'Controllo completo eseguito'),
     ServiceRecord(id: 'service-2', title: 'Controllo sicurezza e bilanciatura', date: DateTime(2026, 4, 22), workshopName: 'Master Driver Brescia Ovest', mileage: 43200),
   ];
