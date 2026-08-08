@@ -36,7 +36,7 @@ class ProfilePage extends StatelessWidget {
                   height: 80,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.redAccent.withOpacity(0.5), width: 2),
+                    border: Border.all(color: Colors.redAccent.withValues(alpha: 0.5), width: 2),
                     image: const DecorationImage(
                       image: NetworkImage('https://i.pravatar.cc/300'), // Avatar d'esempio
                       fit: BoxFit.cover,
@@ -65,9 +65,9 @@ class ProfilePage extends StatelessWidget {
             // LISTA FUNZIONI (STILE LIQUID GLASS)
             Container(
               decoration: BoxDecoration(
-                color: const Color(0xFF161616).withOpacity(0.9),
+                color: const Color(0xFF161616).withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.08), width: 0.5),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.08), width: 0.5),
               ),
               child: Column(
                 children: [
@@ -91,7 +91,7 @@ class ProfilePage extends StatelessWidget {
 
   Widget _buildProfileTile(BuildContext context, IconData icon, String title, Widget? targetPage, {Color color = Colors.white, bool showArrow = true}) {
     return ListTile(
-      leading: Icon(icon, color: color.withOpacity(0.8), size: 22),
+      leading: Icon(icon, color: color.withValues(alpha: 0.8), size: 22),
       title: Text(title, style: TextStyle(color: color, fontSize: 15, fontWeight: FontWeight.w500)),
       trailing: showArrow ? const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 14) : null,
       onTap: () {
@@ -130,6 +130,6 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildDivider() {
-    return Divider(color: Colors.white.withOpacity(0.05), height: 1, indent: 50);
+    return Divider(color: Colors.white.withValues(alpha: 0.05), height: 1, indent: 50);
   }
 }

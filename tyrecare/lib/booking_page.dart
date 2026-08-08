@@ -96,10 +96,10 @@ class _BookingPageState extends State<BookingPage> {
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF161616).withOpacity(0.9),
+                        color: const Color(0xFF161616).withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: isSelezionato ? Colors.redAccent.withOpacity(0.5) : Colors.white.withOpacity(0.08),
+                          color: isSelezionato ? Colors.redAccent.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.08),
                           width: 0.5,
                         ),
                       ),

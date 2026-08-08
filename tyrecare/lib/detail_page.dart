@@ -95,8 +95,8 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                           center: Alignment.center,
                           radius: 0.8,
                           colors: [
-                            const Color(0xFF141414).withOpacity(0.35), // Sfumatura centrale scurita
-                            const Color(0xFF0E0E0E).withOpacity(0.15), // Sfumatura intermedia scurita
+                            const Color(0xFF141414).withValues(alpha: 0.35), // Sfumatura centrale scurita
+                            const Color(0xFF0E0E0E).withValues(alpha: 0.15), // Sfumatura intermedia scurita
                             const Color(0xFF0A0A0A), // Sfondo finale
                           ],
                           stops: const [0.0, 0.5, 1.0],
@@ -122,9 +122,9 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF161616).withOpacity(0.8),
+                          color: const Color(0xFF161616).withValues(alpha: 0.8),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.white.withOpacity(0.1), width: 0.5),
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 0.5),
                         ),
                         child: Column(
                           children: [
@@ -148,9 +148,9 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                         child: OutlinedButton(
                           onPressed: () => _mostraStoricoControlli(context),
                           style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: Colors.white.withOpacity(0.15)),
+                            side: BorderSide(color: Colors.white.withValues(alpha: 0.15)),
                             padding: const EdgeInsets.symmetric(vertical: 16),
-                            backgroundColor: const Color(0xFF161616).withOpacity(0.5),
+                            backgroundColor: const Color(0xFF161616).withValues(alpha: 0.5),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                           child: const Text('STORICO CONTROLLI', 
@@ -186,7 +186,7 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
           child: LinearProgressIndicator(
             value: progress,
             minHeight: 4,
-            backgroundColor: Colors.white.withOpacity(0.05),
+            backgroundColor: Colors.white.withValues(alpha: 0.05),
             valueColor: AlwaysStoppedAnimation<Color>(colore),
           ),
         ),
@@ -259,9 +259,9 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                             margin: const EdgeInsets.only(bottom: 12),
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF161616).withOpacity(0.9),
+                              color: const Color(0xFF161616).withValues(alpha: 0.9),
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.white.withOpacity(0.08), width: 0.5),
+                              border: Border.all(color: Colors.white.withValues(alpha: 0.08), width: 0.5),
                             ),
                             child: Row(
                               children: [

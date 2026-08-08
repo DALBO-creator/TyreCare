@@ -1,6 +1,5 @@
 // lib/home_page.dart
 import 'package:flutter/material.dart';
-import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'models.dart';
 import 'detail_page.dart';
 
@@ -94,9 +93,9 @@ class HomePage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF161616).withOpacity(0.9),
+                  color: const Color(0xFF161616).withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: Colors.white.withOpacity(0.08), width: 0.5),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.08), width: 0.5),
                 ),
                 child: Row(
                   children: [
@@ -130,9 +129,9 @@ class HomePage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Ridotto padding verticale da 12 a 8
               decoration: BoxDecoration(
-                color: const Color(0xFF161616).withOpacity(0.9),
+                color: const Color(0xFF161616).withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.08), width: 0.5),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.08), width: 0.5),
               ),
               child: Column(
                 children: [
@@ -285,12 +284,12 @@ class HomePage extends StatelessWidget {
         height: 84, // Ridotta altezza da 90 a 84 per evitare sovrapposizioni verticali
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1A1A).withOpacity(0.9),
+          color: const Color(0xFF1A1A1A).withValues(alpha: 0.9),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withOpacity(0.12), width: 0.8),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.12), width: 0.8),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 8,
               offset: const Offset(0, 4),
             )
@@ -321,7 +320,7 @@ class HomePage extends StatelessWidget {
                       CircularProgressIndicator(
                         value: 1.0,
                         strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.redAccent.withOpacity(0.2)),
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.redAccent.withValues(alpha: 0.2)),
                       ),
                       CircularProgressIndicator(
                         value: usuraDinamica / 100,
@@ -362,7 +361,7 @@ class _TireGlowPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final Paint paint = Paint()
-      ..color = color.withOpacity(0.5)
+      ..color = color.withValues(alpha: 0.5)
       ..style = PaintingStyle.fill
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
 
@@ -388,7 +387,7 @@ class _TireGlowPainter extends CustomPainter {
 
     // Nucleo più luminoso
     final Paint corePaint = Paint()
-      ..color = color.withOpacity(0.8)
+      ..color = color.withValues(alpha: 0.8)
       ..style = PaintingStyle.fill
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.5);
     canvas.drawPath(path, corePaint);

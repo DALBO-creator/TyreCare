@@ -63,9 +63,9 @@ class MyDataPage extends StatelessWidget {
   Widget _buildDataCard({required List<Widget> children}) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF161616).withOpacity(0.9),
+        color: const Color(0xFF161616).withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.08), width: 0.5),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08), width: 0.5),
       ),
       child: Column(children: children),
     );
@@ -79,6 +79,6 @@ class MyDataPage extends StatelessWidget {
   }
 
   Widget _buildDivider() {
-    return Divider(color: Colors.white.withOpacity(0.05), height: 1, indent: 16, endIndent: 16);
+    return Divider(color: Colors.white.withValues(alpha: 0.05), height: 1, indent: 16, endIndent: 16);
   }
 }

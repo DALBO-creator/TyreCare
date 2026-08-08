@@ -59,10 +59,10 @@ class CheckPage extends StatelessWidget {
               // Padding rimosso a destra e verticale per permettere all'auto di toccare i bordi
               padding: const EdgeInsets.only(left: 16, top: 0, bottom: 0, right: 0),
               decoration: BoxDecoration(
-                color: const Color(0xFF161616).withOpacity(0.9),
+                color: const Color(0xFF161616).withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: isSelezionato ? Colors.redAccent.withOpacity(0.5) : Colors.white.withOpacity(0.08),
+                  color: isSelezionato ? Colors.redAccent.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.08),
                   width: 0.5,
                 ),
               ),
@@ -79,7 +79,7 @@ class CheckPage extends StatelessWidget {
                             margin: const EdgeInsets.only(bottom: 6.0),
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFC62828).withOpacity(0.15),
+                              color: const Color(0xFFC62828).withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: const Text('Principale', style: TextStyle(color: Colors.redAccent, fontSize: 10, fontWeight: FontWeight.bold)),

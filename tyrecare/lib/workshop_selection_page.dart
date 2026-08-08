@@ -196,14 +196,14 @@ class _WorkshopSelectionPageState extends State<WorkshopSelectionPage> {
                   color: const Color(0xFF161616),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: _usaCashback ? Colors.greenAccent.withOpacity(0.5) : Colors.transparent,
+                    color: _usaCashback ? Colors.greenAccent.withValues(alpha: 0.5) : Colors.transparent,
                     width: 1,
                   ),
                 ),
                 child: SwitchListTile(
                   value: _usaCashback,
                   onChanged: (val) => setState(() => _usaCashback = val),
-                  activeColor: Colors.greenAccent,
+                  activeThumbColor: Colors.greenAccent,
                   title: const Text('Usa il tuo cashback', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
                   subtitle: Text('Saldo disponibile: € ${widget.cashbackDisponibile.toStringAsFixed(2)}', style: const TextStyle(color: Colors.grey, fontSize: 12)),
                   secondary: const Icon(Icons.stars_rounded, color: Colors.amber),
