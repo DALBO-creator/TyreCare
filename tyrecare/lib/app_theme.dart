@@ -84,6 +84,6 @@ class PremiumSectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(children: [
     Expanded(child: Text(title.toUpperCase(), style: const TextStyle(color: AppColors.textMuted, letterSpacing: 1, fontSize: 12, fontWeight: FontWeight.w800))),
-    if (action != null) action!,
+    ?action,
   ]);
 }
