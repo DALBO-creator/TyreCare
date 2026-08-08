@@ -1,196 +1,103 @@
-// lib/booking_page.dart
 import 'package:flutter/material.dart';
-import 'workshop_selection_page.dart';
+import 'models.dart';
 
 class BookingPage extends StatefulWidget {
-  final double cashbackDisponibile;
-  final Function(Map<String, dynamic>) onBookingConfirmed;
-
   const BookingPage({
-    super.key, 
-    required this.cashbackDisponibile,
-    required this.onBookingConfirmed
+    super.key,
+    this.cashbackDisponibile = 0,
+    this.onBookingConfirmed,
   });
+
+  // Deprecated compatibility parameters: loyalty is not part of the booking flow.
+  final double cashbackDisponibile;
+  final ValueChanged<Map<String, dynamic>>? onBookingConfirmed;
 
   @override
   State<BookingPage> createState() => _BookingPageState();
 }
 
 class _BookingPageState extends State<BookingPage> {
-  // Teniamo traccia del servizio selezionato tramite l'indice della lista
-  int _indiceServizioSelezionato = 0;
-
-  // Struttura dati ufficiale presa dal tuo mockup
-  final List<Map<String, dynamic>> _serviziUfficiali = [
-    {
-      'titolo': 'Cambio gomme stagionale',
-      'sottotitolo': 'Estive / Invernali',
-      'icona': Icons.published_with_changes_rounded,
-    },
-    {
-      'titolo': 'Controllo sicurezza',
-      'sottotitolo': 'Controllo completo pneumatici',
-      'icona': Icons.gpp_good_outlined,
-    },
-    {
-      'titolo': 'Equilibratura',
-      'sottotitolo': 'Bilanciamento ruote',
-      'icona': Icons.incomplete_circle_rounded, // Un'icona tecnica che ricorda la centratura (o Icons.incomplete_circle)
-    },
-    {
-      'titolo': 'Convergenza',
-      'sottotitolo': 'Allineamento ruote',
-      'icona': Icons.sync_alt_rounded,
-    },
-    {
-      'titolo': 'Riparazione pneumatici',
-      'sottotitolo': 'Riparazione e sostituzione',
-      'icona': Icons.build_circle_outlined,
-    },
-    {
-      'titolo': 'Deposito gomme',
-      'sottotitolo': 'Custodia stagionale',
-      'icona': Icons.grid_view_rounded,
-    },
-    {
-      'titolo': 'Intervento su strada',
-      'sottotitolo': 'Assistenza h24',
-      'icona': Icons.car_repair_rounded,
-    },
+  static const _services = <String>[
+    'Controllo pneumatici',
+    'Cambio gomme stagionale',
+    'Equilibratura',
+    'Convergenza',
+    'Riparazione pneumatico',
+    'Deposito gomme',
   ];
+  final _notesController = TextEditingController();
+  String _service = _services.first;
+  DateTime? _date;
+  String? _time;
+  final String _workshop = 'PneusHub Travagliato';
+
+  @override
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final canSubmit = _date != null && _time != null;
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
-      appBar: AppBar(
-        title: const Text('Prenota un servizio', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
-        backgroundColor: const Color(0xFF0A0A0A),
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          tooltip: 'Indietro',
-          onPressed: () => Navigator.maybePop(context),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text(
-              'Cosa desideri prenotare?',
-              style: TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 16),
-
-            // LA LISTA DEI SERVIZI PRESI DAL MOCKUP
-            Expanded(
-              child: Column(
-                children: List.generate(_serviziUfficiali.length, (index) {
-                  final servizio = _serviziUfficiali[index];
-                  final isSelezionato = _indiceServizioSelezionato == index;
-
-                  return Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF161616).withValues(alpha: 0.9),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isSelezionato ? Colors.redAccent.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.08),
-                          width: 0.5,
-                        ),
-                      ),
-                      child: InkWell(
-                        onTap: () {
-                          setState(() {
-                            _indiceServizioSelezionato = index;
-                          });
-                        },
-                        borderRadius: BorderRadius.circular(12),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Row(
-                            children: [
-                              Icon(
-                                servizio['icona'] as IconData, 
-                                color: isSelezionato ? Colors.redAccent : Colors.grey,
-                                size: 24,
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      servizio['titolo'] as String,
-                                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      servizio['sottotitolo'] as String,
-                                      style: const TextStyle(color: Colors.grey, fontSize: 11),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const Icon(
-                                Icons.arrow_forward_ios, 
-                                color: Colors.grey, 
-                                size: 14,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // IL BOTTONE SOTTILE PREMIUM "Vedi disponibilità"
-            OutlinedButton(
-              onPressed: () {
-                final servizioScelto = _serviziUfficiali[_indiceServizioSelezionato]['titolo'] as String;
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => WorkshopSelectionPage(
-                      servizioSelezionato: servizioScelto,
-                      cashbackDisponibile: widget.cashbackDisponibile,
-                      onBookingConfirmed: widget.onBookingConfirmed,
-                    ),
-                  ),
-                );
-              },
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Color(0xFF4A1519), width: 1.5), // Bordo rosso scuro sottile come nel mockup
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: const Color(0xFF0A0A0A),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text(
-                'Vedi disponibilità',
-                style: TextStyle(
-                  color: Colors.white, 
-                  fontWeight: FontWeight.w600, 
-                  fontSize: 15,
-                ),
-              ),
-            ),
-          ],
-        ),
+      appBar: AppBar(title: const Text('Richiedi un appuntamento')),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          const Text('Invia una richiesta alla tua officina. La data sarà confermata dall’operatore.', style: TextStyle(color: Colors.grey)),
+          const SizedBox(height: 24),
+          _section('Officina associata', Card(color: const Color(0xFF161616), child: ListTile(leading: const Icon(Icons.storefront_outlined, color: Colors.redAccent), title: Text(_workshop), subtitle: const Text('Officina affiliata TyreCare')))),
+          _section('Servizio richiesto', DropdownButtonFormField<String>(
+            value: _service,
+            dropdownColor: const Color(0xFF161616),
+            items: _services.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
+            onChanged: (value) => setState(() => _service = value!),
+            decoration: _decoration(),
+          )),
+          _section('Preferenza di data', InkWell(
+            onTap: _pickDate,
+            child: InputDecorator(decoration: _decoration(), child: Row(children: [const Icon(Icons.calendar_today_outlined, size: 20), const SizedBox(width: 12), Text(_date == null ? 'Seleziona una data' : _formatDate(_date!))])),
+          )),
+          if (_date != null) _section('Fascia oraria preferita', Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: ['09:00', '10:30', '14:30', '16:00', '17:30'].map((item) => ChoiceChip(label: Text(item), selected: _time == item, onSelected: (_) => setState(() => _time = item))).toList(),
+          )),
+          _section('Note per l’officina', TextField(
+            controller: _notesController,
+            maxLines: 4,
+            maxLength: 300,
+            decoration: _decoration().copyWith(hintText: 'Es. vibrazione durante la guida, richiesta controllo pressione…'),
+          )),
+          const SizedBox(height: 12),
+          FilledButton(
+            onPressed: canSubmit ? _submit : null,
+            child: const Padding(padding: EdgeInsets.symmetric(vertical: 14), child: Text('INVIA RICHIESTA')),
+          ),
+          const SizedBox(height: 12),
+          const Text('Riceverai una notifica quando l’officina confermerà o modificherà l’appuntamento.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontSize: 12)),
+        ],
       ),
     );
+  }
+
+  Widget _section(String title, Widget child) => Padding(
+        padding: const EdgeInsets.only(bottom: 20),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(fontWeight: FontWeight.bold)), const SizedBox(height: 8), child]),
+      );
+  InputDecoration _decoration() => InputDecoration(filled: true, fillColor: const Color(0xFF161616), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none));
+  Future<void> _pickDate() async {
+    final result = await showDatePicker(context: context, firstDate: DateTime.now(), lastDate: DateTime.now().add(const Duration(days: 180)), initialDate: _date ?? DateTime.now().add(const Duration(days: 1)));
+    if (result != null) setState(() { _date = result; _time = null; });
+  }
+  String _formatDate(DateTime value) => '${value.day.toString().padLeft(2, '0')}/${value.month.toString().padLeft(2, '0')}/${value.year}';
+  void _submit() {
+    widget.onBookingConfirmed?.call({'service': _service, 'workshop': _workshop, 'preferredDate': _date, 'preferredTime': _time, 'note': _notesController.text, 'status': AppointmentStatus.requested.name});
+    showDialog(context: context, builder: (dialogContext) => AlertDialog(
+      title: const Text('Richiesta inviata'),
+      content: Text('La richiesta per $_service è stata inviata a $_workshop. Riceverai la conferma dell’officina.'),
+      actions: [TextButton(onPressed: () { Navigator.pop(dialogContext); Navigator.pop(context); }, child: const Text('OK'))],
+    ));
   }
 }
