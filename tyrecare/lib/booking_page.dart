@@ -97,7 +97,20 @@ class _BookingPageState extends State<BookingPage> {
     showDialog(context: context, builder: (dialogContext) => AlertDialog(
       title: const Text('Richiesta inviata'),
       content: Text('La richiesta per $_service è stata inviata a $_workshop. Riceverai la conferma dell’officina.'),
-      actions: [TextButton(onPressed: () { Navigator.pop(dialogContext); Navigator.pop(context); }, child: const Text('OK'))],
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(dialogContext);
+            if (!mounted) return;
+            setState(() {
+              _date = null;
+              _time = null;
+              _notesController.clear();
+            });
+          },
+          child: const Text('OK'),
+        ),
+      ],
     ));
   }
 }
