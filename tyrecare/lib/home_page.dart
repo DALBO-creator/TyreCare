@@ -56,30 +56,16 @@ class HomePage extends StatelessWidget {
           const SizedBox(height: 16),
           _statusCard(context, minTread, condition, inspection),
           const SizedBox(height: 24),
-          const Text('Pneumatici', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-          const SizedBox(height: 10),
-          ...tyres.map((tyre) => _tyreTile(tyre)),
+          const PremiumSectionTitle('Pneumatici'),
+          const SizedBox(height: 8),
+          _tyresOverview(context, tyres),
           const SizedBox(height: 20),
           FilledButton.icon(
             onPressed: () => onTabCambiato(2),
             icon: const Icon(Icons.calendar_month),
             label: const Text('PRENOTA UN SERVIZIO'),
           ),
-          TextButton.icon(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => DetailPage(
-                  veicolo: veicolo,
-                  posizioneIniziale: 'ant. sx',
-                  kmSlider: 0,
-                  transazioni: const [],
-                ),
-              ),
-            ),
-            icon: const Icon(Icons.description_outlined),
-            label: const Text('Visualizza scheda tecnica'),
-          ),
+
         ],
       ),
     );
@@ -126,14 +112,40 @@ class HomePage extends StatelessWidget {
         ),
       );
 
-  Widget _tyreTile(Pneumatico tyre) => Card(
-        color: const Color(0xFF161616),
-        child: ListTile(
-          leading: Icon(Icons.tire_repair, color: _color(tyre.condizione)),
-          title: Text(_position(tyre.posizione)),
-          subtitle: Text('${tyre.marca} ${tyre.modello}\n${tyre.misura} · ${tyre.battistradaMm.toStringAsFixed(1)} mm · ${tyre.pressioneBase.toStringAsFixed(1)} bar'),
-          isThreeLine: true,
-          trailing: Text(_conditionLabel(tyre.condizione), style: TextStyle(color: _color(tyre.condizione), fontWeight: FontWeight.bold)),
+  Widget _tyresOverview(BuildContext context, List<Pneumatico> tyres) => Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(children: [
+            Row(children: [
+              const Expanded(child: Text('Posizione', style: TextStyle(color: AppColors.textMuted, fontSize: 12, fontWeight: FontWeight.w700))),
+              const SizedBox(width: 68, child: Text('BATTISTRADA', textAlign: TextAlign.right, style: TextStyle(color: AppColors.textMuted, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: .5))),
+              const SizedBox(width: 76, child: Text('STATO', textAlign: TextAlign.right, style: TextStyle(color: AppColors.textMuted, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: .5))),
+            ]),
+            const SizedBox(height: 6),
+            const Divider(height: 1),
+            ...List.generate(tyres.length, (index) {
+              final tyre = tyres[index];
+              return Column(children: [
+                SizedBox(
+                  height: 54,
+                  child: Row(children: [
+                    Expanded(child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(_position(tyre.posizione), style: const TextStyle(fontWeight: FontWeight.w700)),
+                      Text('${tyre.marca} · ${tyre.pressioneBase.toStringAsFixed(1)} bar', style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                    ])),
+                    SizedBox(width: 68, child: Text('${tyre.battistradaMm.toStringAsFixed(1)} mm', textAlign: TextAlign.right, style: const TextStyle(fontWeight: FontWeight.w700))),
+                    SizedBox(width: 76, child: Text(_conditionLabel(tyre.condizione), textAlign: TextAlign.right, style: TextStyle(color: _color(tyre.condizione), fontSize: 12, fontWeight: FontWeight.w800))),
+                  ]),
+                ),
+                if (index < tyres.length - 1) const Divider(height: 1),
+              ]);
+            }),
+            const SizedBox(height: 6),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => DetailPage(veicolo: veicolo))), child: const Text('VEDI DETTAGLIO')),
+            ),
+          ]),
         ),
       );
 
