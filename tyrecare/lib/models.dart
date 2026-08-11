@@ -80,6 +80,26 @@ class TyreInspection {
   final String note;
 }
 
+class Appointment {
+  const Appointment({
+    required this.id,
+    required this.service,
+    required this.workshopName,
+    required this.preferredDate,
+    required this.preferredTime,
+    required this.status,
+    this.note = '',
+  });
+
+  final String id;
+  final String service;
+  final String workshopName;
+  final DateTime preferredDate;
+  final String preferredTime;
+  final AppointmentStatus status;
+  final String note;
+}
+
 class ServiceRecord {
   const ServiceRecord({
     required this.id,

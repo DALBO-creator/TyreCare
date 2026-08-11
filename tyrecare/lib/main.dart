@@ -189,6 +189,8 @@ class _MainContainerState extends State<MainContainer> {
   int _indiceAutoSelezionata = 0;
   Veicolo get _veicoloCorrente => _veicoliDisponibili[_indiceAutoSelezionata];
 
+  final List<Appointment> _appuntamenti = [];
+
   final List<ServiceRecord> _storicoInterventi = [
     ServiceRecord(id: 'service-1', title: 'Cambio gomme stagionale', date: DateTime(2026, 5, 14), workshopName: 'PneusHub Travagliato', mileage: 43800, note: 'Controllo completo eseguito'),
     ServiceRecord(id: 'service-2', title: 'Controllo sicurezza e bilanciatura', date: DateTime(2026, 4, 22), workshopName: 'Master Driver Brescia Ovest', mileage: 43200),
@@ -206,9 +208,23 @@ class _MainContainerState extends State<MainContainer> {
       indicePrincipale: _indiceAutoSelezionata,
       onVeicoloSelezionato: (index) => setState(() => _indiceAutoSelezionata = index),
     ),
-    BookingPage(cashbackDisponibile: 0, onBookingConfirmed: (_) {}),
+    BookingPage(
+      onBookingConfirmed: (request) {
+        setState(() {
+          _appuntamenti.insert(0, Appointment(
+            id: DateTime.now().microsecondsSinceEpoch.toString(),
+            service: request['service'] as String,
+            workshopName: request['workshop'] as String,
+            preferredDate: request['preferredDate'] as DateTime,
+            preferredTime: request['preferredTime'] as String,
+            status: AppointmentStatus.requested,
+            note: request['note'] as String,
+          ));
+        });
+      },
+    ),
     HistoryPage(records: _storicoInterventi),
-    ProfilePage(isDemo: widget.isDemo),
+    ProfilePage(isDemo: widget.isDemo, appointments: _appuntamenti),
   ];
 
   @override

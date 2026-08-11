@@ -3,14 +3,16 @@ import 'app_theme.dart';
 import 'app_settings_page.dart';
 import 'help_support_page.dart';
 import 'my_data_page.dart';
+import 'models.dart';
 import 'notifications_page.dart';
 
 /// Customer account area. Technical vehicle data is managed by the workshop;
 /// the customer can manage only account, communication and privacy preferences.
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key, this.isDemo = true});
+  const ProfilePage({super.key, this.isDemo = true, this.appointments = const []});
 
   final bool isDemo;
+  final List<Appointment> appointments;
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +30,8 @@ class ProfilePage extends StatelessWidget {
               _tile(context, Icons.notifications_none_rounded, 'Notifiche', 'Appuntamenti, controlli e promemoria', const NotificationsPage()),
             ],
           ),
+          const SizedBox(height: 20),
+          _appointmentsSection(context),
           const SizedBox(height: 20),
           _section(
             'La mia officina',
@@ -98,6 +102,29 @@ class ProfilePage extends StatelessWidget {
         ),
       );
 
+  Widget _appointmentsSection(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        PremiumSectionTitle('I miei appuntamenti'),
+        const SizedBox(height: 8),
+        Card(
+          child: appointments.isEmpty
+              ? const ListTile(
+                  leading: Icon(Icons.calendar_month_outlined),
+                  title: Text('Nessun appuntamento richiesto'),
+                  subtitle: Text('Prenota un servizio dalla sezione Prenota.'),
+                )
+              : Column(
+                  children: appointments.map((appointment) => ListTile(
+                    leading: const CircleAvatar(backgroundColor: Color(0xFF4A1519), child: Icon(Icons.schedule_outlined, color: Colors.redAccent)),
+                    title: Text(appointment.service, style: const TextStyle(fontWeight: FontWeight.w700)),
+                    subtitle: Text('${_date(appointment.preferredDate)} · ${appointment.preferredTime}\n${appointment.workshopName}'),
+                    isThreeLine: true,
+                    trailing: const Text('IN ATTESA', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.w800, fontSize: 10)),
+                    onTap: () => _appointmentInfo(context, appointment),
+                  )).toList(),
+                ),
+        ),
+      ]);
+
   Widget _section(String title, List<Widget> children) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         PremiumSectionTitle(title),
         const SizedBox(height: 8),
@@ -112,6 +139,8 @@ class ProfilePage extends StatelessWidget {
         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => page)),
       );
 
+  String _date(DateTime value) => '${value.day.toString().padLeft(2, '0')}/${value.month.toString().padLeft(2, '0')}/${value.year}';
+  void _appointmentInfo(BuildContext context, Appointment appointment) => _show(context, 'Richiesta appuntamento', 'Hai richiesto ${appointment.service} per il ${_date(appointment.preferredDate)} alle ${appointment.preferredTime}. L’officina deve ancora confermare l’appuntamento.');
   void _workshopInfo(BuildContext context) => _show(context, 'Officina associata', 'La tua officina può aggiornare controlli, interventi e veicoli associati. Per modificare l’officina di riferimento contatta il supporto TyreCare.');
   void _vehicleInfo(BuildContext context) => _show(context, 'Associazione veicoli', 'Per garantire dati corretti, i veicoli vengono associati al tuo account dall’officina dopo la verifica della targa.');
   void _privacyInfo(BuildContext context) => _show(context, 'Dati e consenso', 'TyreCare visualizza i dati tecnici condivisi dalla tua officina affiliata per offrirti storico, promemoria e richieste di appuntamento.');
