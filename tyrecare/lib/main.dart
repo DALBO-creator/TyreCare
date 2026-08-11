@@ -38,11 +38,53 @@ class MyApp extends StatelessWidget {
       title: 'TyreCare',
       debugShowCheckedModeBanner: false,
       theme: tyreCareTheme(),
-      // On web without Firebase configuration, expose the complete client UI
-      // with local preview data instead of blocking the app behind a demo gate.
-      home: isFirebaseAvailable ? const AuthWrapper() : const MainContainer(),
+      home: isFirebaseAvailable
+          ? const StartupSplash()
+          : const FirebaseConfigurationPage(),
     );
   }
+}
+
+
+class StartupSplash extends StatefulWidget {
+  const StartupSplash({super.key});
+
+  @override
+  State<StartupSplash> createState() => _StartupSplashState();
+}
+
+class _StartupSplashState extends State<StartupSplash> {
+  bool _completed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (_completed) return const AuthWrapper();
+    return SplashPage(
+      nomeUtente: 'Utente',
+      modelloAuto: 'TyreCare',
+      onFinish: () => setState(() => _completed = true),
+    );
+  }
+}
+
+class FirebaseConfigurationPage extends StatelessWidget {
+  const FirebaseConfigurationPage({super.key});
+
+  @override
+  Widget build(BuildContext context) => const Scaffold(
+        body: Center(
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Icon(Icons.cloud_off_outlined, color: Colors.redAccent, size: 48),
+              SizedBox(height: 16),
+              Text('Firebase non configurato', textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              SizedBox(height: 8),
+              Text('Configura Firebase per questa piattaforma per accedere a TyreCare.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey)),
+            ]),
+          ),
+        ),
+      );
 }
 
 class AuthWrapper extends StatelessWidget {
@@ -54,37 +96,11 @@ class AuthWrapper extends StatelessWidget {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator(color: Colors.redAccent)),
-          );
+          return const Scaffold(body: Center(child: CircularProgressIndicator(color: Colors.redAccent)));
         }
-        return snapshot.hasData ? const Initializer() : const LoginPage();
+        return snapshot.hasData ? const MainContainer() : const LoginPage();
       },
     );
-  }
-}
-
-class Initializer extends StatefulWidget {
-  const Initializer({super.key});
-
-  @override
-  State<Initializer> createState() => _InitializerState();
-}
-
-class _InitializerState extends State<Initializer> {
-  bool _showSplash = true;
-
-  @override
-  Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-    if (_showSplash) {
-      return SplashPage(
-        nomeUtente: user?.displayName ?? user?.email?.split('@')[0] ?? 'Utente',
-        modelloAuto: 'BMW Serie 3',
-        onFinish: () => setState(() => _showSplash = false),
-      );
-    }
-    return const MainContainer();
   }
 }
 
