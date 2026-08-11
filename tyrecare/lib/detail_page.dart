@@ -70,25 +70,43 @@ class DetailPage extends StatelessWidget {
       );
 
   Widget _tyreCard(Pneumatico tyre) => Card(
-        color: const Color(0xFF161616),
-        margin: const EdgeInsets.only(bottom: 8),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              Icon(Icons.tire_repair, color: _color(tyre.condizione)),
-              const SizedBox(width: 10),
-              Expanded(child: Text(_position(tyre.posizione), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
-              Text(_status(tyre.condizione), style: TextStyle(color: _color(tyre.condizione), fontWeight: FontWeight.bold)),
-              const SizedBox(width: 8),
-              SizedBox(width: 38, height: 38, child: Image.asset('assets/cerchioneTyreCare.png', fit: BoxFit.contain)),
-            ]),
-            const Divider(height: 24),
-            _row('Pneumatico', '${tyre.marca} ${tyre.modello}'),
-            _row('Misura', tyre.misura),
-            _row('Battistrada', '${tyre.battistradaMm.toStringAsFixed(1)} mm'),
-            _row('Pressione rilevata', '${tyre.pressioneBase.toStringAsFixed(1)} bar'),
-            _row('DOT', tyre.dot),
+        margin: const EdgeInsets.only(bottom: 12),
+        clipBehavior: Clip.antiAlias,
+        child: SizedBox(
+          height: 222,
+          child: Stack(children: [
+            Positioned(
+              right: -48,
+              bottom: -42,
+              child: Opacity(
+                opacity: .30,
+                child: Image.asset('assets/cerchioneTyreCare.png', width: 220, height: 220, fit: BoxFit.contain),
+              ),
+            ),
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [const Color(0xFF14161B), const Color(0xFF14161B).withValues(alpha: .92), Colors.transparent]),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  Icon(Icons.tire_repair, color: _color(tyre.condizione)),
+                  const SizedBox(width: 10),
+                  Expanded(child: Text(_position(tyre.posizione), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
+                  Text(_status(tyre.condizione), style: TextStyle(color: _color(tyre.condizione), fontWeight: FontWeight.bold)),
+                ]),
+                const Divider(height: 24),
+                _row('Pneumatico', '${tyre.marca} ${tyre.modello}'),
+                _row('Misura', tyre.misura),
+                _row('Battistrada', '${tyre.battistradaMm.toStringAsFixed(1)} mm'),
+                _row('Pressione rilevata', '${tyre.pressioneBase.toStringAsFixed(1)} bar'),
+                _row('DOT', tyre.dot),
+              ]),
+            ),
           ]),
         ),
       );

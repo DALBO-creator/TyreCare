@@ -40,32 +40,41 @@ class CheckPage extends StatelessWidget {
   Widget _vehicleCard(BuildContext context, Veicolo vehicle, bool selected, int index) {
     final inspection = vehicle.ultimoControllo;
     return Card(
-      color: const Color(0xFF161616),
       margin: const EdgeInsets.only(bottom: 12),
+      clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: selected ? Colors.redAccent : Colors.transparent),
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(color: selected ? Colors.redAccent : const Color(0xFF2A2E37)),
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(14),
         onTap: () => onVeicoloSelezionato(index),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              SizedBox(width: 44, height: 34, child: Image.asset('assets/auto.png', fit: BoxFit.contain)),
-              const SizedBox(width: 12),
-              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(vehicle.nome, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17)), Text('${vehicle.targa} · ${vehicle.anno}', style: const TextStyle(color: Colors.grey))])),
-              if (selected) const Chip(label: Text('Selezionato')),
-            ]),
-            const Divider(height: 24),
-            Text(inspection == null ? 'Nessun controllo registrato' : 'Ultimo controllo: ${_date(inspection.date)} · ${inspection.workshopName}', style: const TextStyle(color: Colors.grey, fontSize: 12)),
-            const SizedBox(height: 8),
-            Align(alignment: Alignment.centerRight, child: TextButton.icon(
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => DetailPage(veicolo: vehicle))),
-              icon: const Icon(Icons.description_outlined),
-              label: const Text('SCHEDA TECNICA'),
-            )),
+        child: SizedBox(
+          height: 180,
+          child: Stack(children: [
+            Positioned(right: -14, bottom: -15, child: Opacity(opacity: .55, child: Image.asset('assets/auto.png', width: 245, fit: BoxFit.contain))),
+            Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(colors: [const Color(0xFF14161B), const Color(0xFF14161B).withValues(alpha: .82), Colors.transparent])))),
+            Padding(
+              padding: const EdgeInsets.all(18),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  const Icon(Icons.directions_car_filled_outlined, color: Colors.redAccent, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(vehicle.nome, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18))),
+                  if (selected) const Chip(label: Text('Selezionato')),
+                ]),
+                const SizedBox(height: 4),
+                Text('${vehicle.targa} · ${vehicle.anno}', style: const TextStyle(color: Colors.grey)),
+                const Spacer(),
+                SizedBox(width: 190, child: Text(inspection == null ? 'Nessun controllo registrato' : 'Controllo: ${_date(inspection.date)}\n${inspection.workshopName}', style: const TextStyle(color: Colors.grey, fontSize: 12))),
+                const SizedBox(height: 8),
+                TextButton.icon(
+                  style: TextButton.styleFrom(foregroundColor: Colors.redAccent, padding: EdgeInsets.zero),
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => DetailPage(veicolo: vehicle))),
+                  icon: const Icon(Icons.description_outlined, size: 18),
+                  label: const Text('SCHEDA TECNICA'),
+                ),
+              ]),
+            ),
           ]),
         ),
       ),

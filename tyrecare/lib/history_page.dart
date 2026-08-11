@@ -19,17 +19,29 @@ class HistoryPage extends StatelessWidget {
               itemBuilder: (context, index) {
                 final record = records[index];
                 return Card(
-                  color: const Color(0xFF161616),
                   child: ListTile(
-                    leading: SizedBox(width: 42, height: 42, child: Image.asset('assets/cerchioneTyreCare.png', fit: BoxFit.contain)), 
-                    title: Text(record.title),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    leading: CircleAvatar(
+                      backgroundColor: const Color(0xFF4A1519),
+                      child: Icon(_serviceIcon(record.title), color: Colors.redAccent),
+                    ),
+                    title: Text(record.title, style: const TextStyle(fontWeight: FontWeight.w700)),
                     subtitle: Text('${_date(record.date)} • ${record.workshopName}\n${record.mileage} km'),
                     isThreeLine: true,
+                    trailing: const Icon(Icons.chevron_right),
                   ),
                 );
               },
             ),
     );
+  }
+
+  IconData _serviceIcon(String title) {
+    final normalized = title.toLowerCase();
+    if (normalized.contains('cambio')) return Icons.autorenew_rounded;
+    if (normalized.contains('bilanc') || normalized.contains('sicurezza')) return Icons.verified_outlined;
+    if (normalized.contains('riparazione')) return Icons.build_outlined;
+    return Icons.receipt_long_outlined;
   }
 
   String _date(DateTime date) => '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
