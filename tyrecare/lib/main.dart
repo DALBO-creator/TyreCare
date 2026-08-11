@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'app_theme.dart';
+import 'firebase_options.dart';
 import 'models.dart';
 import 'home_page.dart';
 import 'check_page.dart';
@@ -17,7 +18,9 @@ Future<void> main() async {
 
   var isFirebaseAvailable = true;
   try {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
   } catch (_) {
     // Firebase is optional for the local demo and for platforms that have not
     // yet been configured through FlutterFire.
