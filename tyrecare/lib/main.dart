@@ -38,65 +38,9 @@ class MyApp extends StatelessWidget {
       title: 'TyreCare',
       debugShowCheckedModeBanner: false,
       theme: tyreCareTheme(),
-      home: isFirebaseAvailable
-          ? const AuthWrapper()
-          : const FirebaseConfigurationPage(),
-    );
-  }
-}
-
-class FirebaseConfigurationPage extends StatelessWidget {
-  const FirebaseConfigurationPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(
-                Icons.cloud_off_outlined,
-                color: Colors.redAccent,
-                size: 48,
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Configurazione Firebase non disponibile',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'L’accesso con account richiede Firebase per questa piattaforma.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (_) => const MainContainer(isDemo: true)),
-                    );
-                  },
-                  icon: const Icon(Icons.visibility_outlined),
-                  label: const Text('CONTINUA IN MODALITÀ DEMO'),
-                ),
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'Configura Firebase con FlutterFire per abilitare accesso e registrazione.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey, fontSize: 12),
-              ),
-            ],
-          ),
-        ),
-      ),
+      // On web without Firebase configuration, expose the complete client UI
+      // with local preview data instead of blocking the app behind a demo gate.
+      home: isFirebaseAvailable ? const AuthWrapper() : const MainContainer(),
     );
   }
 }
@@ -145,9 +89,7 @@ class _InitializerState extends State<Initializer> {
 }
 
 class MainContainer extends StatefulWidget {
-  const MainContainer({super.key, this.isDemo = false});
-
-  final bool isDemo;
+  const MainContainer({super.key});
 
   @override
   State<MainContainer> createState() => _MainContainerState();
@@ -218,7 +160,7 @@ class _MainContainerState extends State<MainContainer> {
       },
     ),
     HistoryPage(records: _storicoInterventi),
-    ProfilePage(isDemo: widget.isDemo, appointments: _appuntamenti),
+    ProfilePage(appointments: _appuntamenti),
   ];
 
   @override

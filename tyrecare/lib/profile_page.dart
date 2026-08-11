@@ -9,9 +9,7 @@ import 'notifications_page.dart';
 /// Customer account area. Technical vehicle data is managed by the workshop;
 /// the customer can manage only account, communication and privacy preferences.
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key, this.isDemo = true, this.appointments = const []});
-
-  final bool isDemo;
+  const ProfilePage({super.key, this.appointments = const []});
   final List<Appointment> appointments;
 
   @override
@@ -67,20 +65,6 @@ class ProfilePage extends StatelessWidget {
               ),
             ],
           ),
-          if (isDemo) ...[
-            const SizedBox(height: 24),
-            const Card(
-              color: Color(0xFF161616),
-              child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Row(children: [
-                  Icon(Icons.visibility_outlined, color: Colors.orangeAccent),
-                  SizedBox(width: 12),
-                  Expanded(child: Text('Stai usando la modalità demo. I dati mostrati non sono collegati al gestionale dell’officina.', style: TextStyle(color: Colors.grey))),
-                ]),
-              ),
-            ),
-          ],
         ],
       ),
     );
