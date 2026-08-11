@@ -44,6 +44,8 @@ class HomePage extends StatelessWidget {
           const Text('TYRECARE', style: TextStyle(color: Color(0xFFFF646A), fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 1.6)),
           const SizedBox(height: 6),
           Text('La tua mobilità,\nsempre sotto controllo.', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800, height: 1.1)),
+          const SizedBox(height: 18),
+          _vehicleHero(),
           const SizedBox(height: 22),
           const PremiumSectionTitle('Stato certificato'),
           const SizedBox(height: 8),
@@ -82,6 +84,30 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
+
+  Widget _vehicleHero() => Container(
+        height: 142,
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: AppColors.surfaceRaised,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Stack(children: [
+          Positioned(right: -6, bottom: -12, child: Opacity(opacity: .9, child: Image.asset('assets/auto.png', width: 230, fit: BoxFit.contain))),
+          Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(colors: [AppColors.surfaceRaised, AppColors.surfaceRaised.withValues(alpha: .55), Colors.transparent])))),
+          Padding(
+            padding: const EdgeInsets.all(18),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(veicolo.nome, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 4),
+              Text('${veicolo.targa} · ${veicolo.chilometriIniziali} km', style: const TextStyle(color: AppColors.textMuted)),
+              const Spacer(),
+              const Row(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.verified_outlined, color: AppColors.primaryBright, size: 16), SizedBox(width: 6), Text('Veicolo associato', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700))]),
+            ]),
+          ),
+        ]),
+      );
 
   Widget _statusCard(BuildContext context, double tread, _TyreStatus status, TyreInspection? inspection) => Card(
         color: const Color(0xFF161616),

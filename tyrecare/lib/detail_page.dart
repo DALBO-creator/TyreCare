@@ -80,6 +80,8 @@ class DetailPage extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(child: Text(_position(tyre.posizione), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
               Text(_status(tyre.condizione), style: TextStyle(color: _color(tyre.condizione), fontWeight: FontWeight.bold)),
+              const SizedBox(width: 8),
+              SizedBox(width: 38, height: 38, child: Image.asset('assets/cerchioneTyreCare.png', fit: BoxFit.contain)),
             ]),
             const Divider(height: 24),
             _row('Pneumatico', '${tyre.marca} ${tyre.modello}'),

@@ -21,7 +21,7 @@ class HistoryPage extends StatelessWidget {
                 return Card(
                   color: const Color(0xFF161616),
                   child: ListTile(
-                    leading: const Icon(Icons.build_circle_outlined, color: Colors.redAccent),
+                    leading: SizedBox(width: 42, height: 42, child: Image.asset('assets/cerchioneTyreCare.png', fit: BoxFit.contain)), 
                     title: Text(record.title),
                     subtitle: Text('${_date(record.date)} • ${record.workshopName}\n${record.mileage} km'),
                     isThreeLine: true,

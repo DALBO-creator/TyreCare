@@ -50,7 +50,17 @@ class _BookingPageState extends State<BookingPage> {
           const SizedBox(height: 6),
           const Text('Invia una richiesta alla tua officina. La data sarà confermata dall’operatore.', style: TextStyle(color: AppColors.textMuted)),
           const SizedBox(height: 24),
-          _section('Officina associata', Card(color: const Color(0xFF161616), child: ListTile(leading: const Icon(Icons.storefront_outlined, color: Colors.redAccent), title: Text(_workshop), subtitle: const Text('Officina affiliata TyreCare')))),
+          _section('Officina associata', Card(
+            clipBehavior: Clip.antiAlias,
+            child: SizedBox(
+              height: 104,
+              child: Stack(children: [
+                Positioned(right: 0, top: 0, bottom: 0, width: 155, child: Image.asset('assets/officina.png', fit: BoxFit.cover)),
+                Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(colors: [const Color(0xFF14161B), const Color(0xFF14161B).withValues(alpha: .82), Colors.transparent])))),
+                ListTile(leading: const Icon(Icons.storefront_outlined, color: Colors.redAccent), title: Text(_workshop, style: const TextStyle(fontWeight: FontWeight.bold)), subtitle: const Text('Officina affiliata TyreCare')),
+              ]),
+            ),
+          )),
           _section('Servizio richiesto', DropdownButtonFormField<String>(
             initialValue: _service,
             dropdownColor: const Color(0xFF161616),

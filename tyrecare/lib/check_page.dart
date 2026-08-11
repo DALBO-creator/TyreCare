@@ -53,7 +53,7 @@ class CheckPage extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
-              const Icon(Icons.directions_car_filled_outlined, color: Colors.redAccent),
+              SizedBox(width: 44, height: 34, child: Image.asset('assets/auto.png', fit: BoxFit.contain)),
               const SizedBox(width: 12),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(vehicle.nome, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17)), Text('${vehicle.targa} · ${vehicle.anno}', style: const TextStyle(color: Colors.grey))])),
               if (selected) const Chip(label: Text('Selezionato')),

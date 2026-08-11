@@ -63,9 +63,11 @@ flutter:
   assets:
     - assets/bmw_m4csl-v1.glb
     - assets/autoHomePage.png
+    - assets/auto.png
     - assets/logoTyreCare.png
     - assets/macchinaGarage.png
     - assets/cerchioneTyreCare.png
+    - assets/officina.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
