@@ -7,16 +7,9 @@ class DetailPage extends StatelessWidget {
   const DetailPage({
     super.key,
     required this.veicolo,
-    this.posizioneIniziale = 'antSx',
-    this.kmSlider = 0,
-    this.transazioni = const [],
   });
 
   final Veicolo veicolo;
-  final String posizioneIniziale;
-  // Legacy parameters retained temporarily to avoid breaking old routes.
-  final double kmSlider;
-  final List<Map<String, dynamic>> transazioni;
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +42,7 @@ class DetailPage extends StatelessWidget {
         child: ListTile(
           leading: const Icon(Icons.directions_car_filled_outlined, color: Colors.redAccent),
           title: Text(veicolo.nome, style: const TextStyle(fontWeight: FontWeight.bold)),
-          subtitle: Text('${veicolo.targa} · ${veicolo.chilometriIniziali} km'),
+          subtitle: Text('${veicolo.targa} · ${veicolo.chilometraggio} km'),
         ),
       );
 

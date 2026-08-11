@@ -6,7 +6,6 @@ class Pneumatico {
   const Pneumatico({
     required this.posizione,
     required this.pressioneBase,
-    required this.usuraBase,
     required this.temperatura,
     this.marca = '',
     this.modello = '',
@@ -18,7 +17,6 @@ class Pneumatico {
 
   final String posizione;
   final double pressioneBase;
-  final int usuraBase;
   final int temperatura;
   final String marca;
   final String modello;
@@ -27,31 +25,25 @@ class Pneumatico {
   final double battistradaMm;
   final TyreCondition condizione;
 
-  // Kept for backward compatibility while legacy pages are migrated.
-  int calcolaUsuraDinamica(double _) => usuraBase.clamp(10, 100).toInt();
 }
 
 class Veicolo {
   const Veicolo({
     required this.nome,
     required this.anno,
-    required this.chilometriIniziali,
-    required this.immagineUrl,
+    required this.chilometraggio,
     this.targa = '',
     required this.antSx,
     required this.antDx,
     required this.postSx,
     required this.postDx,
-    this.isPrincipale = false,
     this.ultimoControllo,
   });
 
   final String nome;
   final String anno;
-  final String chilometriIniziali;
-  final String immagineUrl;
+  final int chilometraggio;
   final String targa;
-  final bool isPrincipale;
   final Pneumatico antSx;
   final Pneumatico antDx;
   final Pneumatico postSx;
@@ -59,9 +51,7 @@ class Veicolo {
   final TyreInspection? ultimoControllo;
 
   List<Pneumatico> get pneumatici => [antSx, antDx, postSx, postDx];
-  int chilometriTotali(double _) => int.tryParse(chilometriIniziali) ?? 0;
-  int mediaUsuraGenerale(double _) =>
-      (pneumatici.map((item) => item.usuraBase).reduce((a, b) => a + b) / 4).round();
+
 }
 
 class TyreInspection {

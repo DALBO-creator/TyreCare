@@ -87,7 +87,7 @@ class HomePage extends StatelessWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(veicolo.nome, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
               const SizedBox(height: 4),
-              Text('${veicolo.targa} · ${veicolo.chilometriIniziali} km', style: const TextStyle(color: AppColors.textMuted)),
+              Text('${veicolo.targa} · ${veicolo.chilometraggio} km', style: const TextStyle(color: AppColors.textMuted)),
               const Spacer(),
               const Row(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.verified_outlined, color: AppColors.primaryBright, size: 16), SizedBox(width: 6), Text('Veicolo associato', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700))]),
             ]),
@@ -118,7 +118,14 @@ class HomePage extends StatelessWidget {
           child: Column(children: [
             Row(children: [
               const Expanded(child: Text('Posizione', style: TextStyle(color: AppColors.textMuted, fontSize: 12, fontWeight: FontWeight.w700))),
-              const SizedBox(width: 68, child: Text('BATTISTRADA', textAlign: TextAlign.right, style: TextStyle(color: AppColors.textMuted, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: .5))),
+              const SizedBox(
+                width: 82,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerRight,
+                  child: Text('BATTISTRADA', style: TextStyle(color: AppColors.textMuted, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: .5)),
+                ),
+              ),
               const SizedBox(width: 76, child: Text('STATO', textAlign: TextAlign.right, style: TextStyle(color: AppColors.textMuted, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: .5))),
             ]),
             const SizedBox(height: 6),
@@ -133,7 +140,7 @@ class HomePage extends StatelessWidget {
                       Text(_position(tyre.posizione), style: const TextStyle(fontWeight: FontWeight.w700)),
                       Text('${tyre.marca} · ${tyre.pressioneBase.toStringAsFixed(1)} bar', style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
                     ])),
-                    SizedBox(width: 68, child: Text('${tyre.battistradaMm.toStringAsFixed(1)} mm', textAlign: TextAlign.right, style: const TextStyle(fontWeight: FontWeight.w700))),
+                    SizedBox(width: 82, child: Text('${tyre.battistradaMm.toStringAsFixed(1)} mm', textAlign: TextAlign.right, style: const TextStyle(fontWeight: FontWeight.w700))),
                     SizedBox(width: 76, child: Text(_conditionLabel(tyre.condizione), textAlign: TextAlign.right, style: TextStyle(color: _color(tyre.condizione), fontSize: 12, fontWeight: FontWeight.w800))),
                   ]),
                 ),
