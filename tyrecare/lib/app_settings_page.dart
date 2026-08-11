@@ -22,9 +22,9 @@ class AppSettingsPage extends StatelessWidget {
           children: [
             Container(
               decoration: BoxDecoration(
-                color: const Color(0xFF161616).withOpacity(0.9),
+                color: const Color(0xFF161616).withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.08), width: 0.5),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.08), width: 0.5),
               ),
               child: Column(
                 children: [
@@ -61,6 +61,6 @@ class AppSettingsPage extends StatelessWidget {
   }
 
   Widget _buildDivider() {
-    return Divider(color: Colors.white.withOpacity(0.05), height: 1, indent: 50);
+    return Divider(color: Colors.white.withValues(alpha: 0.05), height: 1, indent: 50);
   }
 }

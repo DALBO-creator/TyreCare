@@ -37,9 +37,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
             const SizedBox(height: 16),
             Container(
               decoration: BoxDecoration(
-                color: const Color(0xFF161616).withOpacity(0.9),
+                color: const Color(0xFF161616).withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.08), width: 0.5),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.08), width: 0.5),
               ),
               child: Column(
                 children: [
@@ -61,13 +61,13 @@ class _NotificationsPageState extends State<NotificationsPage> {
     return SwitchListTile(
       value: value,
       onChanged: onChanged,
-      activeColor: Colors.redAccent,
+      activeThumbColor: Colors.redAccent,
       title: Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
       subtitle: Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12)),
     );
   }
 
   Widget _buildDivider() {
-    return Divider(color: Colors.white.withOpacity(0.05), height: 1, indent: 16, endIndent: 16);
+    return Divider(color: Colors.white.withValues(alpha: 0.05), height: 1, indent: 16, endIndent: 16);
   }
 }

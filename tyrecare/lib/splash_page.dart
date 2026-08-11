@@ -66,10 +66,6 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    String saluto = widget.nomeUtente != null 
-        ? "Bentornato in TyreCare, ${widget.nomeUtente}" 
-        : "Benvenuto in TyreCare";
-
     return Scaffold(
       backgroundColor: const Color(0xFF0A0A0A),
       body: Stack(
@@ -81,7 +77,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                 center: Alignment.center,
                 radius: 1.0,
                 colors: [
-                  const Color(0xFF1A1A1A).withOpacity(0.4),
+                  const Color(0xFF1A1A1A).withValues(alpha: 0.4),
                   const Color(0xFF0A0A0A),
                 ],
               ),
@@ -101,9 +97,9 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                       width: 120, // Dimensione fissa per garantire simmetria perfetta
                       height: 120,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF161616).withOpacity(0.5),
+                        color: const Color(0xFF161616).withValues(alpha: 0.5),
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white.withOpacity(0.05)),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
                       ),
                       child: Center(
                         child: Transform.translate(
@@ -189,12 +185,12 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                               width: 7,
                               height: 7,
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.1 + (0.9 * _getDotOpacity(index))),
+                                color: Colors.white.withValues(alpha: 0.1 + (0.9 * _getDotOpacity(index))),
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   if (_getDotOpacity(index) > 0.8)
                                     BoxShadow(
-                                      color: Colors.white.withOpacity(0.3),
+                                      color: Colors.white.withValues(alpha: 0.3),
                                       blurRadius: 4,
                                       spreadRadius: 1,
                                     )

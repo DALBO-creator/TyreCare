@@ -1,39 +1,31 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
+/// Thin wrapper around Firebase Authentication used by the sign-in UI.
 class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  AuthService({FirebaseAuth? auth}) : _auth = auth ?? FirebaseAuth.instance;
 
-  // Stream per ascoltare lo stato dell'autenticazione
+  final FirebaseAuth _auth;
+
   Stream<User?> get user => _auth.authStateChanges();
 
-  // Login con email e password
   Future<User?> signInWithEmailAndPassword(String email, String password) async {
-    try {
-      UserCredential result = await _auth.signInWithEmailAndPassword(email: email, password: password);
-      return result.user;
-    } catch (e) {
-      print(e.toString());
-      rethrow;
-    }
+    final result = await _auth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    return result.user;
   }
 
-  // Registrazione con email e password
-  Future<User?> registerWithEmailAndPassword(String email, String password) async {
-    try {
-      UserCredential result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
-      return result.user;
-    } catch (e) {
-      print(e.toString());
-      rethrow;
-    }
+  Future<User?> registerWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
+    final result = await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    return result.user;
   }
 
-  // Logout
-  Future<void> signOut() async {
-    try {
-      return await _auth.signOut();
-    } catch (e) {
-      print(e.toString());
-    }
-  }
+  Future<void> signOut() => _auth.signOut();
 }

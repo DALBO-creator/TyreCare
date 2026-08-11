@@ -2,46 +2,92 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'app_theme.dart';
+import 'firebase_options.dart';
 import 'models.dart';
 import 'home_page.dart';
 import 'check_page.dart';
-import 'booking_page.dart_page.dart';
+import 'booking_page.dart';
+import 'history_page.dart';
 import 'profile_page.dart';
 import 'splash_page.dart';
 import 'login_page.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Nota: Firebase richiede la configurazione specifica per piattaforma (google-services.json / GoogleService-Info.plist)
-  // Se non l'hai ancora fatta, questa riga darà errore.
+
+  var isFirebaseAvailable = true;
   try {
-    await Firebase.initializeApp();
-  } catch (e) {
-    print("Firebase non inizializzato: assicurati di aver aggiunto i file di configurazione.");
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (_) {
+    // Firebase is optional for the local demo and for platforms that have not
+    // yet been configured through FlutterFire.
+    isFirebaseAvailable = false;
   }
-  runApp(const MyApp());
+
+  runApp(MyApp(isFirebaseAvailable: isFirebaseAvailable));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, this.isFirebaseAvailable = true});
+
+  final bool isFirebaseAvailable;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'TyreCare',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        primarySwatch: Colors.red,
-        scaffoldBackgroundColor: const Color(0xFF0A0A0A),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF0A0A0A),
-          elevation: 0,
-        ),
-      ),
-      home: const AuthWrapper(),
+      theme: tyreCareTheme(),
+      home: isFirebaseAvailable
+          ? const StartupSplash()
+          : const FirebaseConfigurationPage(),
     );
   }
+}
+
+
+class StartupSplash extends StatefulWidget {
+  const StartupSplash({super.key});
+
+  @override
+  State<StartupSplash> createState() => _StartupSplashState();
+}
+
+class _StartupSplashState extends State<StartupSplash> {
+  bool _completed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (_completed) return const AuthWrapper();
+    return SplashPage(
+      nomeUtente: 'Utente',
+      modelloAuto: 'TyreCare',
+      onFinish: () => setState(() => _completed = true),
+    );
+  }
+}
+
+class FirebaseConfigurationPage extends StatelessWidget {
+  const FirebaseConfigurationPage({super.key});
+
+  @override
+  Widget build(BuildContext context) => const Scaffold(
+        body: Center(
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Icon(Icons.cloud_off_outlined, color: Colors.redAccent, size: 48),
+              SizedBox(height: 16),
+              Text('Firebase non configurato', textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              SizedBox(height: 8),
+              Text('Configura Firebase per questa piattaforma per accedere a TyreCare.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey)),
+            ]),
+          ),
+        ),
+      );
 }
 
 class AuthWrapper extends StatelessWidget {
@@ -55,41 +101,9 @@ class AuthWrapper extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(body: Center(child: CircularProgressIndicator(color: Colors.redAccent)));
         }
-        if (snapshot.hasData) {
-          return const Initializer();
-        } else {
-          return const LoginPage();
-        }
+        return snapshot.hasData ? const MainContainer() : const LoginPage();
       },
     );
-  }
-}
-
-class Initializer extends StatefulWidget {
-  const Initializer({super.key});
-
-  @override
-  State<Initializer> createState() => _InitializerState();
-}
-
-class _InitializerState extends State<Initializer> {
-  bool _showSplash = true;
-
-  @override
-  Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-    if (_showSplash) {
-      return SplashPage(
-        nomeUtente: user?.displayName ?? user?.email?.split('@')[0] ?? "Utente",
-        modelloAuto: "BMW Serie 3", // Modello principale
-        onFinish: () {
-          setState(() {
-            _showSplash = false;
-          });
-        },
-      );
-    }
-    return const MainContainer();
   }
 }
 
@@ -102,121 +116,71 @@ class MainContainer extends StatefulWidget {
 
 class _MainContainerState extends State<MainContainer> {
   int _indiceSelezionato = 0;
-  double _cashbackGlobale = 150.00; 
-  double _kmSimulatiDalloSlider = 0.0;
-
-  final List<Map<String, dynamic>> _transazioniWallet = [
-    {
-      'titolo': 'Cambio gomme stagionale',
-      'officina': 'PneusHub Travagliato',
-      'data': '14 Maggio 2026',
-      'importo': '+€ 15.00',
-      'tipo': 'guadagno'
-    },
-    {
-      'titolo': 'Controllo sicurezza & Bilanciatura',
-      'officina': 'Master Driver Brescia Ovest',
-      'data': '22 Aprile 2026',
-      'importo': '+€ 8.50',
-      'tipo': 'guadagno'
-    },
-    {
-      'titolo': 'Riscatto Buono Sconto',
-      'officina': 'Garage iperGomme Castegnato',
-      'data': '10 Marzo 2026',
-      'importo': '-€ 20.00',
-      'tipo': 'speso'
-    },
-  ];
-
   final List<Veicolo> _veicoliDisponibili = [
     Veicolo(
       nome: 'BMW Serie 3',
       anno: '2019',
-      chilometriIniziali: '43800',
-      immagineUrl: 'https://images.pngimages.com/download/0b18f8e0d6da7e923e1e9a26372bf9dc.png',
-      isPrincipale: true,
-      antSx: Pneumatico(posizione: 'antSx', pressioneBase: 2.4, usuraBase: 90, temperatura: 28),
-      antDx: Pneumatico(posizione: 'antDx', pressioneBase: 2.5, usuraBase: 95, temperatura: 29),
-      postSx: Pneumatico(posizione: 'postSx', pressioneBase: 2.3, usuraBase: 85, temperatura: 28),
-      postDx: Pneumatico(posizione: 'postDx', pressioneBase: 2.4, usuraBase: 92, temperatura: 28),
+      targa: 'GA123BC',
+      chilometraggio: 43800,
+      ultimoControllo: TyreInspection(id: 'inspection-1', date: DateTime(2026, 8, 2), workshopName: 'PneusHub Travagliato', mileage: 43800, note: 'Pressioni verificate. Nessuna anomalia rilevata.'),
+      antSx: Pneumatico(posizione: 'antSx', pressioneBase: 2.4, temperatura: 28, marca: 'Pirelli', modello: 'Cinturato All Season', misura: '225/45 R17', dot: '1424', battistradaMm: 6.2, condizione: TyreCondition.excellent),
+      antDx: Pneumatico(posizione: 'antDx', pressioneBase: 2.5, temperatura: 29, marca: 'Pirelli', modello: 'Cinturato All Season', misura: '225/45 R17', dot: '1424', battistradaMm: 6.0, condizione: TyreCondition.excellent),
+      postSx: Pneumatico(posizione: 'postSx', pressioneBase: 2.3, temperatura: 28, marca: 'Pirelli', modello: 'Cinturato All Season', misura: '225/45 R17', dot: '1424', battistradaMm: 5.4, condizione: TyreCondition.excellent),
+      postDx: Pneumatico(posizione: 'postDx', pressioneBase: 2.4, temperatura: 28, marca: 'Pirelli', modello: 'Cinturato All Season', misura: '225/45 R17', dot: '1424', battistradaMm: 5.5, condizione: TyreCondition.excellent),
     ),
     Veicolo(
       nome: 'Audi A3',
       anno: '2021',
-      chilometriIniziali: '80000',
-      immagineUrl: 'https://images.pngimages.com/download/0b18f8e0d6da7e923e1e9a26372bf9dc.png',
-      isPrincipale: false,
-      antSx: Pneumatico(posizione: 'antSx', pressioneBase: 2.2, usuraBase: 65, temperatura: 25),
-      antDx: Pneumatico(posizione: 'antDx', pressioneBase: 2.2, usuraBase: 67, temperatura: 25),
-      postSx: Pneumatico(posizione: 'postSx', pressioneBase: 2.1, usuraBase: 60, temperatura: 24),
-      postDx: Pneumatico(posizione: 'postDx', pressioneBase: 2.1, usuraBase: 62, temperatura: 24),
+      targa: 'HD456EF',
+      chilometraggio: 80000,
+      ultimoControllo: TyreInspection(id: 'inspection-2', date: DateTime(2026, 7, 18), workshopName: 'PneusHub Travagliato', mileage: 80000, note: 'Controllo stagionale completato.'),
+      antSx: Pneumatico(posizione: 'antSx', pressioneBase: 2.2, temperatura: 25, marca: 'Michelin', modello: 'Primacy 4', misura: '205/55 R16', dot: '3522', battistradaMm: 3.4, condizione: TyreCondition.monitor),
+      antDx: Pneumatico(posizione: 'antDx', pressioneBase: 2.2, temperatura: 25, marca: 'Michelin', modello: 'Primacy 4', misura: '205/55 R16', dot: '3522', battistradaMm: 3.3, condizione: TyreCondition.monitor),
+      postSx: Pneumatico(posizione: 'postSx', pressioneBase: 2.1, temperatura: 24, marca: 'Michelin', modello: 'Primacy 4', misura: '205/55 R16', dot: '3522', battistradaMm: 3.1, condizione: TyreCondition.monitor),
+      postDx: Pneumatico(posizione: 'postDx', pressioneBase: 2.1, temperatura: 24, marca: 'Michelin', modello: 'Primacy 4', misura: '205/55 R16', dot: '3522', battistradaMm: 3.2, condizione: TyreCondition.monitor),
     ),
   ];
 
   int _indiceAutoSelezionata = 0;
   Veicolo get _veicoloCorrente => _veicoliDisponibili[_indiceAutoSelezionata];
 
-  List<Widget> _ottieniPagine() {
-    return [
-      HomePage(
-        veicolo: _veicoloCorrente,
-        kmSlider: _kmSimulatiDalloSlider,
-        listaNomiVeicoli: _veicoliDisponibili.map((v) => v.nome).toList(),
-        transazioni: _transazioniWallet,
-        onAutoCambiata: (nuovoNome) {
-          setState(() {
-            _indiceAutoSelezionata = _veicoliDisponibili.indexWhere((v) => v.nome == nuovoNome);
-            _kmSimulatiDalloSlider = 0.0; // Resettiamo la simulazione se cambia auto
-          });
-        },
-        onKmVariati: (nuoviKm) {
-          setState(() {
-            _kmSimulatiDalloSlider = nuoviKm;
-          });
-        },
-        onTabCambiato: (index) {
-          setState(() {
-            _indiceSelezionato = index;
-          });
-        },
-      ),
-      CheckPage(
-        veicoli: _veicoliDisponibili,
-        indicePrincipale: _indiceAutoSelezionata,
-        onVeicoloSelezionato: (index) {
-          setState(() {
-            _indiceAutoSelezionata = index;
-            _kmSimulatiDalloSlider = 0.0; // Reset simulazione
-          });
-        },
-      ), 
-      BookingPage(
-        cashbackDisponibile: _cashbackGlobale,
-        onBookingConfirmed: (nuovaAttivita) {
-          setState(() {
-            _transazioniWallet.insert(0, {
-              'titolo': nuovaAttivita['titolo'],
-              'officina': nuovaAttivita['officina'],
-              'data': nuovaAttivita['data'],
-              'importo': nuovaAttivita['importo'],
-              'tipo': nuovaAttivita['tipo'],
-              'isDiscount': nuovaAttivita['isDiscount'] ?? false,
-            });
-            _cashbackGlobale += nuovaAttivita['cashbackValue'] as double;
-            if (_transazioniWallet.length > 5) {
-              _transazioniWallet.removeLast();
-            }
-          });
-        },
-      ),
-      WalletPage(
-        saldoAttuale: _cashbackGlobale,
-        transazioni: _transazioniWallet,
-      ),
-      const ProfilePage(),
-    ];
-  }
+  final List<Appointment> _appuntamenti = [];
+
+  final List<ServiceRecord> _storicoInterventi = [
+    ServiceRecord(id: 'service-1', title: 'Cambio gomme stagionale', date: DateTime(2026, 5, 14), workshopName: 'PneusHub Travagliato', mileage: 43800, note: 'Controllo completo eseguito'),
+    ServiceRecord(id: 'service-2', title: 'Controllo sicurezza e bilanciatura', date: DateTime(2026, 4, 22), workshopName: 'Master Driver Brescia Ovest', mileage: 43200),
+  ];
+
+  List<Widget> _ottieniPagine() => [
+    HomePage(
+      veicolo: _veicoloCorrente,
+      veicoli: _veicoliDisponibili,
+      onAutoCambiata: (targa) => setState(() => _indiceAutoSelezionata = _veicoliDisponibili.indexWhere((item) => item.targa == targa)),
+      onTabCambiato: (index) => setState(() => _indiceSelezionato = index),
+    ),
+    CheckPage(
+      veicoli: _veicoliDisponibili,
+      indicePrincipale: _indiceAutoSelezionata,
+      onVeicoloSelezionato: (index) => setState(() => _indiceAutoSelezionata = index),
+    ),
+    BookingPage(
+      onBookingConfirmed: (request) {
+        setState(() {
+          _appuntamenti.insert(0, Appointment(
+            id: DateTime.now().microsecondsSinceEpoch.toString(),
+            service: request['service'] as String,
+            workshopName: request['workshop'] as String,
+            preferredDate: request['preferredDate'] as DateTime,
+            preferredTime: request['preferredTime'] as String,
+            status: AppointmentStatus.requested,
+            note: request['note'] as String,
+          ));
+        });
+      },
+    ),
+    HistoryPage(records: _storicoInterventi),
+    ProfilePage(appointments: _appuntamenti),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -225,15 +189,12 @@ class _MainContainerState extends State<MainContainer> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _indiceSelezionato,
         type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color(0xFF0A0A0A),
-        selectedItemColor: Colors.redAccent,
-        unselectedItemColor: Colors.grey,
         onTap: (index) => setState(() => _indiceSelezionato = index),
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.directions_car), label: 'Auto'),
           BottomNavigationBarItem(icon: Icon(Icons.calendar_month), label: 'Prenota'),
-          BottomNavigationBarItem(icon: Icon(Icons.account_balance_wallet), label: 'Wallet'),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Storico'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profilo'),
         ],
       ),

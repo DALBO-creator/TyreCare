@@ -1,17 +1,23 @@
-# tyrecare
+# TyreCare
 
-A new Flutter project.
+App Flutter per il monitoraggio dello stato degli pneumatici, la gestione dei veicoli e la prenotazione di servizi presso officine convenzionate.
 
-## Getting Started
+## Requisiti
 
-This project is a starting point for a Flutter application.
+- Flutter SDK compatibile con Dart `^3.12.2`
+- Un progetto Firebase configurato per le piattaforme che usano autenticazione
 
-A few resources to get you started if this is your first Flutter project:
+## Avvio
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+```bash
+flutter pub get
+flutter analyze
+flutter test
+flutter run
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Per Android è incluso `android/app/google-services.json` e il plugin Google Services è abilitato in Gradle. Per iOS, web, macOS e Windows configura Firebase con FlutterFire prima di avviare l'app su tali piattaforme (ad esempio con `flutterfire configure`). Se Firebase non può essere inizializzato, l'app mostra una schermata esplicativa invece di andare in errore durante l'accesso.
+
+## Verifiche automatiche
+
+I test in `test/models_test.dart` coprono i calcoli di chilometraggio e usura degli pneumatici. Eseguire `flutter analyze` e `flutter test` prima di ogni rilascio.
