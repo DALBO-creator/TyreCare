@@ -61,11 +61,8 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/bmw_m4csl-v1.glb
-    - assets/autoHomePage.png
     - assets/auto.png
     - assets/logoTyreCare.png
-    - assets/macchinaGarage.png
     - assets/cerchioneTyreCare.png
     - assets/officina.png
 
