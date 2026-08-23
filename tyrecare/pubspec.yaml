@@ -42,7 +42,9 @@ dev_dependencies:
   flutter_launcher_icons: ^0.13.1
 
 flutter_launcher_icons:
-  android: "launcher_icon"
+  # Keep the generated Android resource aligned with the resources tracked in
+  # android/app/src/main/res and referenced by AndroidManifest.xml.
+  android: "ic_launcher"
   ios: true
   image_path: "assets/logoTyreCare.png"
   min_sdk_android: 21

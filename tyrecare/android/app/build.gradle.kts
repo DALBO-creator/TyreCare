@@ -28,6 +28,14 @@ android {
     }
 
     buildTypes {
+        // Keep the debug variant explicitly debuggable so Flutter can attach to
+        // the Dart VM over adb when a physical device is connected by USB.
+        getByName("debug") {
+            isDebuggable = true
+            isMinifyEnabled = false
+            isShrinkResources = false
+        }
+
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
