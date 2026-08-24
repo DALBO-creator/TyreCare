@@ -155,7 +155,7 @@
     gradient.addColorStop(0, 'rgba(27, 182, 155, .25)');
     gradient.addColorStop(1, 'rgba(27, 182, 155, 0)');
 
-    Chart.defaults.font.family = 'Manrope, sans-serif';
+    Chart.defaults.font.family = 'Arial, Helvetica, sans-serif';
     Chart.defaults.animation.duration = 700;
 
     revenueChart = new Chart(context, {
@@ -202,7 +202,7 @@
             grid: { color: 'rgba(128, 147, 165, .11)', drawTicks: false },
             ticks: {
               color: '#a5b0bc',
-              font: { family: 'DM Mono, monospace', size: 8 },
+              font: { family: 'Consolas, Liberation Mono, monospace', size: 8 },
               padding: 10,
               maxTicksLimit: 5,
               callback: (value) => `€${Math.round(value / 1000)}k`,
