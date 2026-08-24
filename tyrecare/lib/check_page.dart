@@ -48,8 +48,8 @@ class CheckPage extends StatelessWidget {
       ),
       child: InkWell(
         onTap: () => onVeicoloSelezionato(index),
-        child: SizedBox(
-          height: 180,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 180),
           child: Stack(children: [
             Positioned(right: -14, bottom: -15, child: Opacity(opacity: .55, child: Image.asset('assets/auto.png', width: 245, fit: BoxFit.contain))),
             Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(colors: [const Color(0xFF14161B), const Color(0xFF14161B).withValues(alpha: .82), Colors.transparent])))),
@@ -64,7 +64,7 @@ class CheckPage extends StatelessWidget {
                 ]),
                 const SizedBox(height: 4),
                 Text('${vehicle.targa} · ${vehicle.anno}', style: const TextStyle(color: Colors.grey)),
-                const Spacer(),
+                const SizedBox(height: 16),
                 SizedBox(width: 190, child: Text(inspection == null ? 'Nessun controllo registrato' : 'Controllo: ${_date(inspection.date)}\n${inspection.workshopName}', style: const TextStyle(color: Colors.grey, fontSize: 12))),
                 const SizedBox(height: 8),
                 TextButton.icon(

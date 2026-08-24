@@ -1,4 +1,6 @@
 // lib/main.dart
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -117,6 +119,7 @@ class MainContainer extends StatefulWidget {
 
 class _MainContainerState extends State<MainContainer> {
   final _firebaseBackend = TyreCareFirebaseBackend();
+  StreamSubscription<List<Appointment>>? _appointmentsSubscription;
   int _indiceSelezionato = 0;
   final List<Veicolo> _veicoliDisponibili = [
     Veicolo(
@@ -153,6 +156,42 @@ class _MainContainerState extends State<MainContainer> {
     ServiceRecord(id: 'service-2', title: 'Controllo sicurezza e bilanciatura', date: DateTime(2026, 4, 22), workshopName: 'Master Driver Brescia Ovest', mileage: 43200),
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _appointmentsSubscription = _firebaseBackend.watchCurrentUserAppointments().listen(_onAppointmentsChanged);
+  }
+
+  void _onAppointmentsChanged(List<Appointment> appointments) {
+    if (!mounted) return;
+    setState(() {
+      _appuntamenti
+        ..clear()
+        ..addAll(appointments);
+      for (final appointment in appointments.where(_isHistoricalAppointment)) {
+        final historyId = 'appointment-${appointment.id}';
+        if (_storicoInterventi.every((record) => record.id != historyId)) {
+          _storicoInterventi.insert(0, ServiceRecord(
+            id: historyId,
+            title: appointment.service,
+            date: appointment.preferredDate,
+            workshopName: appointment.workshopName,
+            mileage: _veicoloCorrente.chilometraggio,
+            note: appointment.note,
+          ));
+        }
+      }
+    });
+  }
+
+  bool _isHistoricalAppointment(Appointment appointment) => appointment.status == AppointmentStatus.confirmed || appointment.status == AppointmentStatus.completed;
+
+  @override
+  void dispose() {
+    _appointmentsSubscription?.cancel();
+    super.dispose();
+  }
+
   List<Widget> _ottieniPagine() => [
     HomePage(
       veicolo: _veicoloCorrente,
@@ -181,22 +220,10 @@ class _MainContainerState extends State<MainContainer> {
           note: request['note'] as String? ?? '',
         );
 
-        if (!mounted) return;
-        setState(() {
-          _appuntamenti.insert(0, Appointment(
-            id: DateTime.now().microsecondsSinceEpoch.toString(),
-            service: request['service'] as String,
-            workshopName: request['workshop'] as String,
-            preferredDate: preferredDate,
-            preferredTime: preferredTime,
-            status: AppointmentStatus.requested,
-            note: request['note'] as String? ?? '',
-          ));
-        });
       },
     ),
     HistoryPage(records: _storicoInterventi),
-    ProfilePage(appointments: _appuntamenti),
+    ProfilePage(appointments: _appuntamenti.where((appointment) => !_isHistoricalAppointment(appointment)).toList()),
   ];
 
   @override

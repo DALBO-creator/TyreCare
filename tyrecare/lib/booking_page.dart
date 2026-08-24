@@ -58,7 +58,18 @@ class _BookingPageState extends State<BookingPage> {
               child: Stack(children: [
                 Positioned(right: 0, top: 0, bottom: 0, width: 155, child: Image.asset('assets/officina.png', fit: BoxFit.cover)),
                 Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(colors: [const Color(0xFF14161B), const Color(0xFF14161B).withValues(alpha: .82), Colors.transparent])))),
-                ListTile(leading: const Icon(Icons.storefront_outlined, color: Colors.redAccent), title: Text(_workshop, style: const TextStyle(fontWeight: FontWeight.bold)), subtitle: const Text('Officina affiliata TyreCare')),
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  right: 155,
+                  bottom: 0,
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.only(left: 16, right: 4),
+                    leading: const Icon(Icons.storefront_outlined, color: Colors.redAccent),
+                    title: Text(_workshop, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: const Text('Officina affiliata TyreCare'),
+                  ),
+                ),
               ]),
             ),
           )),

@@ -102,7 +102,7 @@ class ProfilePage extends StatelessWidget {
                     title: Text(appointment.service, style: const TextStyle(fontWeight: FontWeight.w700)),
                     subtitle: Text('${_date(appointment.preferredDate)} · ${appointment.preferredTime}\n${appointment.workshopName}'),
                     isThreeLine: true,
-                    trailing: const Text('IN ATTESA', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.w800, fontSize: 10)),
+                    trailing: Text(_statusLabel(appointment.status), style: TextStyle(color: _statusColor(appointment.status), fontWeight: FontWeight.w800, fontSize: 10)),
                     onTap: () => _appointmentInfo(context, appointment),
                   )).toList(),
                 ),
@@ -124,7 +124,27 @@ class ProfilePage extends StatelessWidget {
       );
 
   String _date(DateTime value) => '${value.day.toString().padLeft(2, '0')}/${value.month.toString().padLeft(2, '0')}/${value.year}';
-  void _appointmentInfo(BuildContext context, Appointment appointment) => _show(context, 'Richiesta appuntamento', 'Hai richiesto ${appointment.service} per il ${_date(appointment.preferredDate)} alle ${appointment.preferredTime}. L’officina deve ancora confermare l’appuntamento.');
+  String _statusLabel(AppointmentStatus status) => switch (status) {
+        AppointmentStatus.requested => 'IN ATTESA',
+        AppointmentStatus.confirmed => 'CONFERMATO',
+        AppointmentStatus.quoteAvailable => 'PREVENTIVO',
+        AppointmentStatus.completed => 'COMPLETATO',
+        AppointmentStatus.cancelled => 'ANNULLATO',
+      };
+  Color _statusColor(AppointmentStatus status) => switch (status) {
+        AppointmentStatus.requested => Colors.orangeAccent,
+        AppointmentStatus.confirmed || AppointmentStatus.completed => Colors.greenAccent,
+        AppointmentStatus.quoteAvailable => Colors.blueAccent,
+        AppointmentStatus.cancelled => Colors.redAccent,
+      };
+  String _appointmentMessage(Appointment appointment) => switch (appointment.status) {
+        AppointmentStatus.requested => 'L’officina deve ancora confermare l’appuntamento.',
+        AppointmentStatus.confirmed => 'L’appuntamento è stato confermato dall’officina.',
+        AppointmentStatus.quoteAvailable => 'È disponibile un nuovo preventivo da verificare.',
+        AppointmentStatus.completed => 'L’intervento risulta completato e archiviato nello storico.',
+        AppointmentStatus.cancelled => 'L’appuntamento è stato annullato. Contatta l’officina per una nuova data.',
+      };
+  void _appointmentInfo(BuildContext context, Appointment appointment) => _show(context, 'Dettaglio appuntamento', 'Hai richiesto ${appointment.service} per il ${_date(appointment.preferredDate)} alle ${appointment.preferredTime}. ${_appointmentMessage(appointment)}${appointment.note.isEmpty ? '' : '\n\nNota: ${appointment.note}'}');
   void _workshopInfo(BuildContext context) => _show(context, 'Officina associata', 'La tua officina può aggiornare controlli, interventi e veicoli associati. Per modificare l’officina di riferimento contatta il supporto TyreCare.');
   void _vehicleInfo(BuildContext context) => _show(context, 'Associazione veicoli', 'Per garantire dati corretti, i veicoli vengono associati al tuo account dall’officina dopo la verifica della targa.');
   void _privacyInfo(BuildContext context) => _show(context, 'Dati e consenso', 'TyreCare visualizza i dati tecnici condivisi dalla tua officina affiliata per offrirti storico, promemoria e richieste di appuntamento.');
