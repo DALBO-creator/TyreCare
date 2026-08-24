@@ -424,6 +424,46 @@
     });
   }
 
+  function syncStatusControlClass(control) {
+    control.classList.toggle('confirmed', control.value === 'confirmed' || control.value === 'completed');
+    control.classList.toggle('pending', control.value === 'requested' || control.value === 'cancelled');
+  }
+
+  function setupAppointmentManagement() {
+    const list = $('#appointmentList');
+    if (!list) return;
+    list.addEventListener('change', async (event) => {
+      const control = event.target.closest('.appointment-status-select');
+      if (!control) return;
+      const previousStatus = control.dataset.status || control.value;
+      const nextStatus = control.value;
+      control.dataset.status = nextStatus;
+      syncStatusControlClass(control);
+
+      if (control.dataset.demo === 'true' || !liveUser || !firebaseDb || !control.dataset.appointmentId) {
+        showToast(`Stato demo aggiornato: ${statusLabel(nextStatus)}.`);
+        return;
+      }
+
+      control.disabled = true;
+      try {
+        await firebaseDb.collection('appointments').doc(control.dataset.appointmentId).update({
+          status: nextStatus,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+        showToast(`Appuntamento aggiornato: ${statusLabel(nextStatus)}.`);
+      } catch (error) {
+        console.warn('TyreCare Firebase appointment update failed:', error);
+        control.value = previousStatus;
+        control.dataset.status = previousStatus;
+        syncStatusControlClass(control);
+        showToast('Impossibile aggiornare lo stato dell’appuntamento.');
+      } finally {
+        control.disabled = false;
+      }
+    });
+  }
+
   function setupTheme() {
     const themeToggle = $('#themeToggle');
     const savedTheme = window.localStorage.getItem('tyrecare-theme');
@@ -517,6 +557,12 @@
     return status === 'confirmed' || status === 'completed' ? 'confirmed' : 'pending';
   }
 
+  function statusSelectMarkup(status, appointmentId = '') {
+    const selected = (value) => value === status ? ' selected' : '';
+    const identifier = appointmentId ? ` data-appointment-id="${escapeHtml(appointmentId)}"` : ' data-demo="true"';
+    return `<select class="appointment-status-select ${appointmentClass(status)}" data-status="${escapeHtml(status)}"${identifier} aria-label="Stato appuntamento"><option value="requested"${selected('requested')}>In attesa</option><option value="confirmed"${selected('confirmed')}>Confermato</option><option value="completed"${selected('completed')}>Completato</option><option value="cancelled"${selected('cancelled')}>Annullato</option></select>`;
+  }
+
   function snapshotDate(value) {
     if (!value) return null;
     if (typeof value.toDate === 'function') return value.toDate();
@@ -536,15 +582,19 @@
     list.innerHTML = '';
     documents.slice(0, 8).forEach((appointment, index) => {
       const date = snapshotDate(appointment.preferredDate);
-      const customer = escapeHtml(appointment.customerName || 'Cliente TyreCare');
+      const customerName = String(appointment.customerName || 'Cliente TyreCare');
+      const customer = escapeHtml(customerName);
       const service = escapeHtml(appointment.service || 'Servizio da definire');
+      const noteValue = String(appointment.note || '').trim();
+      const note = escapeHtml(noteValue);
       const time = escapeHtml(appointment.preferredTime || '--:--');
       const status = appointment.status || 'requested';
-      const initials = customer.replace(/[^A-Za-zÀ-ÿ ]/g, '').split(' ').filter(Boolean).map((part) => part[0]).join('').slice(0, 2).toUpperCase() || 'TC';
+      const initials = customerName.replace(/[^A-Za-zÀ-ÿ ]/g, '').split(' ').filter(Boolean).map((part) => part[0]).join('').slice(0, 2).toUpperCase() || 'TC';
+      const noteMarkup = note ? `<div class="appointment-note" title="${note}"><i class="bi bi-sticky"></i> Nota: ${note}</div>` : '';
       const palette = ['teal-bg', 'violet-bg', 'orange-bg', 'blue-bg'];
       const item = document.createElement('div');
       item.className = 'appointment-item';
-      item.innerHTML = `<div class="appointment-time"><strong>${time}</strong><span>${date ? new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'short' }).format(date) : 'Da definire'}</span></div><div class="appointment-avatar ${palette[index % palette.length]}">${escapeHtml(initials)}</div><div class="appointment-info"><strong>${customer}</strong><span><i class="bi bi-car-front"></i> ${service}</span></div><span class="appointment-status ${appointmentClass(status)}">${statusLabel(status)}</span><button class="item-more" aria-label="Opzioni appuntamento"><i class="bi bi-three-dots-vertical"></i></button>`;
+      item.innerHTML = `<div class="appointment-time"><strong>${time}</strong><span>${date ? new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'short' }).format(date) : 'Da definire'}</span></div><div class="appointment-avatar ${palette[index % palette.length]}">${escapeHtml(initials)}</div><div class="appointment-info"><strong>${customer}</strong><span><i class="bi bi-car-front"></i> ${service}</span>${noteMarkup}</div>${statusSelectMarkup(status, appointment.id)}<button class="item-more" aria-label="Opzioni appuntamento"><i class="bi bi-three-dots-vertical"></i></button>`;
       list.appendChild(item);
       if (date) appointmentDates.add(dateKey(date));
     });
@@ -677,6 +727,7 @@
     setupCalendar();
     setupClientTable();
     setupAppointmentForm();
+    setupAppointmentManagement();
     setupTheme();
     setupUtilities();
     setupFirebase();

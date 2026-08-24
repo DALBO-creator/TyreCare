@@ -101,7 +101,9 @@ L’app Flutter usa `TyreCareFirebaseBackend` in `tyrecare/lib/firebase_backend.
 1. viene aggiornato il documento `customers/{uid}`;
 2. viene creato un documento in `appointments` con `workshopId: la-santi-gomme`;
 3. la dashboard autenticata legge gli appuntamenti e i clienti dell’officina;
-4. il personale dell’officina può poi lavorare sui dati dal gestionale.
+4. il personale può cambiare lo stato dell’appuntamento direttamente dalla lista;
+5. le note inserite dal cliente sono visibili sotto il servizio;
+6. il personale dell’officina può poi lavorare sui dati dal gestionale.
 
 Per il momento la dashboard visualizza i dati demo quando Firestore è vuoto. Il passaggio successivo sarà sostituire i KPI demo con aggregazioni reali su `payments`, `services` e `appointments`.
 
