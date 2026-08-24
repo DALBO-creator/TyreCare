@@ -40,6 +40,7 @@
   let liveUser;
   let liveUnsubscribers = [];
   let liveCounts = { appointments: 0, customers: 0 };
+  let pendingDelete = null;
 
   const $ = (selector, parent = document) => parent.querySelector(selector);
   const $$ = (selector, parent = document) => [...parent.querySelectorAll(selector)];
@@ -381,12 +382,14 @@
       const date = $('#appointmentDate').value;
       const time = $('#appointmentTime').value;
       const service = $('#appointmentService').value;
+      const appointmentNote = $('#appointmentNote').value.trim();
       if (!client || !date || !time || !service) return;
 
       const [year, month, day] = date.split('-').map(Number);
+      let createdAppointmentId = '';
       try {
         if (liveUser && firebaseDb) {
-          await firebaseDb.collection('appointments').add({
+          const createdAppointment = await firebaseDb.collection('appointments').add({
             workshopId: WORKSHOP_ID,
             workshopName: 'La Santi Gomme',
             customerId: liveUser.uid,
@@ -395,11 +398,12 @@
             service,
             preferredDate: firebase.firestore.Timestamp.fromDate(new Date(year, month - 1, day)),
             preferredTime: time,
-            note: $('#appointmentNote').value.trim(),
+            note: appointmentNote,
             status: 'confirmed',
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
           });
+          createdAppointmentId = createdAppointment.id;
         }
       } catch (error) {
         console.warn('TyreCare Firebase appointment write failed:', error);
@@ -413,7 +417,9 @@
       const color = palette[document.querySelectorAll('.appointment-item').length % palette.length];
       const item = document.createElement('div');
       item.className = 'appointment-item';
-      item.innerHTML = `<div class="appointment-time"><strong>${time}</strong><span>Nuovo</span></div><div class="appointment-avatar ${color}">${initials}</div><div class="appointment-info"><strong>${client}</strong><span><i class="bi bi-car-front"></i> ${service} · ${readableDate}</span></div><span class="appointment-status pending">Da confermare</span><button class="item-more" aria-label="Opzioni appuntamento"><i class="bi bi-three-dots-vertical"></i></button>`;
+      const createdStatus = liveUser ? 'confirmed' : 'requested';
+      const noteMarkup = appointmentNote ? `<div class="appointment-note" title="${escapeHtml(appointmentNote)}"><i class="bi bi-sticky"></i> Nota: ${escapeHtml(appointmentNote)}</div>` : '';
+      item.innerHTML = `<div class="appointment-time"><strong>${time}</strong><span>Nuovo</span></div><div class="appointment-avatar ${color}">${initials}</div><div class="appointment-info"><strong>${client}</strong><span><i class="bi bi-car-front"></i> ${service} · ${readableDate}</span>${noteMarkup}</div>${statusSelectMarkup(createdStatus, createdAppointmentId)}<button class="item-more" ${createdAppointmentId ? `data-appointment-id="${escapeHtml(createdAppointmentId)}"` : ''} aria-label="Gestisci appuntamento"><i class="bi bi-three-dots-vertical"></i></button>`;
       $('#appointmentList')?.prepend(item);
 
       const modalElement = $('#appointmentModal');
@@ -460,6 +466,50 @@
         showToast('Impossibile aggiornare lo stato dell’appuntamento.');
       } finally {
         control.disabled = false;
+      }
+    });
+
+    list.addEventListener('click', (event) => {
+      const moreButton = event.target.closest('.item-more');
+      if (!moreButton) return;
+      const item = moreButton.closest('.appointment-item');
+      if (!item) return;
+      pendingDelete = { id: moreButton.dataset.appointmentId || '', item };
+      const customer = $('.appointment-info strong', item)?.textContent.trim() || 'Cliente TyreCare';
+      const service = $('.appointment-info span', item)?.textContent.trim() || 'Intervento programmato';
+      const note = $('.appointment-note', item)?.textContent.trim();
+      const summary = $('#deleteAppointmentSummary');
+      if (summary) {
+        summary.innerHTML = `<strong>${escapeHtml(customer)}</strong><span>${escapeHtml(service)}</span>${note ? `<small>${escapeHtml(note)}</small>` : ''}`;
+      }
+      bootstrap.Modal.getOrCreateInstance($('#deleteAppointmentModal')).show();
+    });
+
+    $('#confirmDeleteAppointment')?.addEventListener('click', async (event) => {
+      if (!pendingDelete) return;
+      const deleteButton = event.currentTarget;
+      const { id, item } = pendingDelete;
+      deleteButton.disabled = true;
+      try {
+        if (id && liveUser && firebaseDb) {
+          await firebaseDb.collection('appointments').doc(id).delete();
+          showToast('Appuntamento eliminato dai prossimi controlli.');
+        } else {
+          item.remove();
+          if (!list.querySelector('.appointment-item')) {
+            list.innerHTML = '<div class="empty-appointment-state"><i class="bi bi-calendar2-check"></i><strong>Nessun prossimo controllo</strong><span>Gli appuntamenti creati dall’app compariranno qui.</span></div>';
+          }
+          const counter = $('.nav-link[data-section="appointments"] .nav-counter');
+          if (counter && !liveUser) counter.textContent = String(list.querySelectorAll('.appointment-item').length);
+          showToast('Appuntamento rimosso dalla demo.');
+        }
+        bootstrap.Modal.getInstance($('#deleteAppointmentModal'))?.hide();
+        pendingDelete = null;
+      } catch (error) {
+        console.warn('TyreCare Firebase appointment delete failed:', error);
+        showToast('Impossibile eliminare l’appuntamento.');
+      } finally {
+        deleteButton.disabled = false;
       }
     });
   }
@@ -572,7 +622,15 @@
 
   function renderLiveAppointments(snapshot) {
     const list = $('#appointmentList');
-    if (!list || snapshot.empty) return;
+    if (!list) return;
+    const counter = $('.nav-link[data-section="appointments"] .nav-counter');
+    appointmentDates.clear();
+    if (snapshot.empty) {
+      list.innerHTML = '<div class="empty-appointment-state"><i class="bi bi-calendar2-check"></i><strong>Nessun prossimo controllo</strong><span>Gli appuntamenti creati dall’app compariranno qui.</span></div>';
+      if (counter) counter.textContent = '0';
+      renderCalendar();
+      return;
+    }
     const documents = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     documents.sort((left, right) => {
       const leftDate = snapshotDate(left.preferredDate)?.getTime() || 0;
@@ -594,12 +652,11 @@
       const palette = ['teal-bg', 'violet-bg', 'orange-bg', 'blue-bg'];
       const item = document.createElement('div');
       item.className = 'appointment-item';
-      item.innerHTML = `<div class="appointment-time"><strong>${time}</strong><span>${date ? new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'short' }).format(date) : 'Da definire'}</span></div><div class="appointment-avatar ${palette[index % palette.length]}">${escapeHtml(initials)}</div><div class="appointment-info"><strong>${customer}</strong><span><i class="bi bi-car-front"></i> ${service}</span>${noteMarkup}</div>${statusSelectMarkup(status, appointment.id)}<button class="item-more" aria-label="Opzioni appuntamento"><i class="bi bi-three-dots-vertical"></i></button>`;
+      item.innerHTML = `<div class="appointment-time"><strong>${time}</strong><span>${date ? new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'short' }).format(date) : 'Da definire'}</span></div><div class="appointment-avatar ${palette[index % palette.length]}">${escapeHtml(initials)}</div><div class="appointment-info"><strong>${customer}</strong><span><i class="bi bi-car-front"></i> ${service}</span>${noteMarkup}</div>${statusSelectMarkup(status, appointment.id)}<button class="item-more" data-appointment-id="${escapeHtml(appointment.id)}" aria-label="Gestisci appuntamento"><i class="bi bi-three-dots-vertical"></i></button>`;
       list.appendChild(item);
       if (date) appointmentDates.add(dateKey(date));
     });
     renderCalendar();
-    const counter = $('.nav-link[data-section="appointments"] .nav-counter');
     if (counter) counter.textContent = String(documents.length);
   }
 
