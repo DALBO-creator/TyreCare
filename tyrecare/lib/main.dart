@@ -122,7 +122,7 @@ class _MainContainerState extends State<MainContainer> {
       anno: '2019',
       targa: 'GA123BC',
       chilometraggio: 43800,
-      ultimoControllo: TyreInspection(id: 'inspection-1', date: DateTime(2026, 8, 2), workshopName: 'PneusHub Travagliato', mileage: 43800, note: 'Pressioni verificate. Nessuna anomalia rilevata.'),
+      ultimoControllo: TyreInspection(id: 'inspection-1', date: DateTime(2026, 8, 2), workshopName: 'La Santi Gomme', mileage: 43800, note: 'Pressioni verificate. Nessuna anomalia rilevata.'),
       antSx: Pneumatico(posizione: 'antSx', pressioneBase: 2.4, temperatura: 28, marca: 'Pirelli', modello: 'Cinturato All Season', misura: '225/45 R17', dot: '1424', battistradaMm: 6.2, condizione: TyreCondition.excellent),
       antDx: Pneumatico(posizione: 'antDx', pressioneBase: 2.5, temperatura: 29, marca: 'Pirelli', modello: 'Cinturato All Season', misura: '225/45 R17', dot: '1424', battistradaMm: 6.0, condizione: TyreCondition.excellent),
       postSx: Pneumatico(posizione: 'postSx', pressioneBase: 2.3, temperatura: 28, marca: 'Pirelli', modello: 'Cinturato All Season', misura: '225/45 R17', dot: '1424', battistradaMm: 5.4, condizione: TyreCondition.excellent),
@@ -133,7 +133,7 @@ class _MainContainerState extends State<MainContainer> {
       anno: '2021',
       targa: 'HD456EF',
       chilometraggio: 80000,
-      ultimoControllo: TyreInspection(id: 'inspection-2', date: DateTime(2026, 7, 18), workshopName: 'PneusHub Travagliato', mileage: 80000, note: 'Controllo stagionale completato.'),
+      ultimoControllo: TyreInspection(id: 'inspection-2', date: DateTime(2026, 7, 18), workshopName: 'La Santi Gomme', mileage: 80000, note: 'Controllo stagionale completato.'),
       antSx: Pneumatico(posizione: 'antSx', pressioneBase: 2.2, temperatura: 25, marca: 'Michelin', modello: 'Primacy 4', misura: '205/55 R16', dot: '3522', battistradaMm: 3.4, condizione: TyreCondition.monitor),
       antDx: Pneumatico(posizione: 'antDx', pressioneBase: 2.2, temperatura: 25, marca: 'Michelin', modello: 'Primacy 4', misura: '205/55 R16', dot: '3522', battistradaMm: 3.3, condizione: TyreCondition.monitor),
       postSx: Pneumatico(posizione: 'postSx', pressioneBase: 2.1, temperatura: 24, marca: 'Michelin', modello: 'Primacy 4', misura: '205/55 R16', dot: '3522', battistradaMm: 3.1, condizione: TyreCondition.monitor),
@@ -147,7 +147,7 @@ class _MainContainerState extends State<MainContainer> {
   final List<Appointment> _appuntamenti = [];
 
   final List<ServiceRecord> _storicoInterventi = [
-    ServiceRecord(id: 'service-1', title: 'Cambio gomme stagionale', date: DateTime(2026, 5, 14), workshopName: 'PneusHub Travagliato', mileage: 43800, note: 'Controllo completo eseguito'),
+    ServiceRecord(id: 'service-1', title: 'Cambio gomme stagionale', date: DateTime(2026, 5, 14), workshopName: 'La Santi Gomme', mileage: 43800, note: 'Controllo completo eseguito'),
     ServiceRecord(id: 'service-2', title: 'Controllo sicurezza e bilanciatura', date: DateTime(2026, 4, 22), workshopName: 'Master Driver Brescia Ovest', mileage: 43200),
   ];
 

@@ -36,7 +36,7 @@ class ProfilePage extends StatelessWidget {
             [
               ListTile(
                 leading: const Icon(Icons.storefront_outlined, color: Colors.redAccent),
-                title: const Text('PneusHub Travagliato'),
+                title: const Text('La Santi Gomme'),
                 subtitle: const Text('Officina affiliata di riferimento'),
                 trailing: const Icon(Icons.verified_outlined, color: Colors.greenAccent),
                 onTap: () => _workshopInfo(context),

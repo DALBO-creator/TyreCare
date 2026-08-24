@@ -30,7 +30,7 @@ class _BookingPageState extends State<BookingPage> {
   String _service = _services.first;
   DateTime? _date;
   String? _time;
-  final String _workshop = 'PneusHub Travagliato';
+  final String _workshop = 'La Santi Gomme';
 
   @override
   void dispose() {

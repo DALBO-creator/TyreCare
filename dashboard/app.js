@@ -16,18 +16,18 @@
   const revenueSeries = {
     7: {
       labels: ['18 ago', '19 ago', '20 ago', '21 ago', '22 ago', '23 ago', 'oggi'],
-      values: [2580, 3150, 2820, 3910, 3440, 4210, 3880],
-      total: '€ 23.990,00',
+      values: [6480, 7240, 6910, 8460, 7780, 9250, 8200],
+      total: '€ 54.320,00',
     },
     30: {
       labels: ['01 ago', '05 ago', '10 ago', '15 ago', '20 ago', '22 ago', 'oggi'],
-      values: [6900, 10900, 13100, 15700, 19100, 21800, 24860],
-      total: '€ 24.860,40',
+      values: [12400, 18600, 24500, 31600, 37900, 44200, 48760],
+      total: '€ 48.760,40',
     },
     90: {
       labels: ['giu', 'fine giu', 'lug', 'fine lug', 'ago', 'oggi'],
-      values: [16200, 19400, 21100, 23800, 25500, 24860],
-      total: '€ 68.420,70',
+      values: [32600, 44800, 62100, 79200, 103400, 128460],
+      total: '€ 128.460,70',
     },
   };
 
@@ -152,8 +152,8 @@
     if (!canvas || typeof Chart === 'undefined') return;
     const context = canvas.getContext('2d');
     const gradient = context.createLinearGradient(0, 0, 0, 230);
-    gradient.addColorStop(0, 'rgba(27, 182, 155, .25)');
-    gradient.addColorStop(1, 'rgba(27, 182, 155, 0)');
+    gradient.addColorStop(0, 'rgba(230, 73, 79, .22)');
+    gradient.addColorStop(1, 'rgba(230, 73, 79, 0)');
 
     Chart.defaults.font.family = 'Arial, Helvetica, sans-serif';
     Chart.defaults.animation.duration = 700;
@@ -164,7 +164,7 @@
         labels: revenueSeries[30].labels,
         datasets: [{
           data: revenueSeries[30].values,
-          borderColor: '#1bb69b',
+          borderColor: '#E6494F',
           backgroundColor: gradient,
           borderWidth: 2,
           fill: true,
@@ -172,7 +172,7 @@
           pointRadius: 0,
           pointHoverRadius: 5,
           pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: '#1bb69b',
+          pointHoverBorderColor: '#E6494F',
           pointHoverBorderWidth: 3,
         }],
       },
@@ -222,7 +222,7 @@
         labels: ['Gomme stagionali', 'Controllo e bilanciatura', 'Convergenza', 'Altri servizi'],
         datasets: [{
           data: [42, 31, 17, 10],
-          backgroundColor: ['#1bb69b', '#7a6df2', '#f0a44b', '#d6dde5'],
+          backgroundColor: ['#E6494F', '#14161B', '#7D848B', '#D9DCDF'],
           borderWidth: 0,
           hoverOffset: 5,
           spacing: 3,
@@ -421,11 +421,11 @@
         'TyreCare Partner — Report performance',
         '',
         'Periodo;Agosto 2026',
-        'Ricavi netti;€ 24.860,40',
-        'Appuntamenti;86',
-        'Clienti attivi;128',
-        'Ticket medio;€ 289,07',
-        'Tasso ritorno clienti;74%',
+        'Ricavi netti;€ 48.760,40',
+        'Appuntamenti;164',
+        'Clienti attivi;284',
+        'Ticket medio;€ 347,80',
+        'Tasso ritorno clienti;82%',
       ].join('\n');
       downloadFile('tyrecare-report-agosto-2026.csv', report);
       showToast('Report performance esportato.');
