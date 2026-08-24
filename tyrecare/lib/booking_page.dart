@@ -11,7 +11,7 @@ class BookingPage extends StatefulWidget {
 
   // Deprecated compatibility parameters: loyalty is not part of the booking flow.
   final double cashbackDisponibile;
-  final ValueChanged<Map<String, dynamic>>? onBookingConfirmed;
+  final Future<void> Function(Map<String, dynamic>)? onBookingConfirmed;
 
   @override
   State<BookingPage> createState() => _BookingPageState();
@@ -30,6 +30,7 @@ class _BookingPageState extends State<BookingPage> {
   String _service = _services.first;
   DateTime? _date;
   String? _time;
+  bool _isSubmitting = false;
   final String _workshop = 'La Santi Gomme';
 
   @override
@@ -40,7 +41,7 @@ class _BookingPageState extends State<BookingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final canSubmit = _date != null && _time != null;
+    final canSubmit = _date != null && _time != null && !_isSubmitting;
     return Scaffold(
       appBar: AppBar(title: const Text('Richiedi un appuntamento')),
       body: ListView(
@@ -105,25 +106,48 @@ class _BookingPageState extends State<BookingPage> {
     if (result != null) setState(() { _date = result; _time = null; });
   }
   String _formatDate(DateTime value) => '${value.day.toString().padLeft(2, '0')}/${value.month.toString().padLeft(2, '0')}/${value.year}';
-  void _submit() {
-    widget.onBookingConfirmed?.call({'service': _service, 'workshop': _workshop, 'preferredDate': _date, 'preferredTime': _time, 'note': _notesController.text, 'status': AppointmentStatus.requested.name});
-    showDialog(context: context, builder: (dialogContext) => AlertDialog(
-      title: const Text('Richiesta inviata'),
-      content: Text('La richiesta per $_service è stata inviata a $_workshop. Riceverai la conferma dell’officina.'),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.pop(dialogContext);
-            if (!mounted) return;
-            setState(() {
-              _date = null;
-              _time = null;
-              _notesController.clear();
-            });
-          },
-          child: const Text('OK'),
+  Future<void> _submit() async {
+    final selectedDate = _date;
+    final selectedTime = _time;
+    if (selectedDate == null || selectedTime == null || _isSubmitting) return;
+
+    setState(() => _isSubmitting = true);
+    try {
+      await widget.onBookingConfirmed?.call({
+        'service': _service,
+        'workshop': _workshop,
+        'preferredDate': selectedDate,
+        'preferredTime': selectedTime,
+        'note': _notesController.text,
+        'status': AppointmentStatus.requested.name,
+      });
+      if (!mounted) return;
+      await showDialog<void>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('Richiesta inviata'),
+          content: Text('La richiesta per $_service è stata inviata a $_workshop. Riceverai la conferma dell’officina.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('OK'),
+            ),
+          ],
         ),
-      ],
-    ));
+      );
+      if (!mounted) return;
+      setState(() {
+        _date = null;
+        _time = null;
+        _notesController.clear();
+      });
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Impossibile inviare la richiesta: $error')),
+      );
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
   }
 }

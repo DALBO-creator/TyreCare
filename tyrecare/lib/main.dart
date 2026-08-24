@@ -12,6 +12,7 @@ import 'history_page.dart';
 import 'profile_page.dart';
 import 'splash_page.dart';
 import 'login_page.dart';
+import 'firebase_backend.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -115,6 +116,7 @@ class MainContainer extends StatefulWidget {
 }
 
 class _MainContainerState extends State<MainContainer> {
+  final _firebaseBackend = TyreCareFirebaseBackend();
   int _indiceSelezionato = 0;
   final List<Veicolo> _veicoliDisponibili = [
     Veicolo(
@@ -164,16 +166,31 @@ class _MainContainerState extends State<MainContainer> {
       onVeicoloSelezionato: (index) => setState(() => _indiceAutoSelezionata = index),
     ),
     BookingPage(
-      onBookingConfirmed: (request) {
+      onBookingConfirmed: (request) async {
+        final preferredDate = request['preferredDate'] as DateTime?;
+        final preferredTime = request['preferredTime'] as String?;
+        if (preferredDate == null || preferredTime == null) {
+          throw StateError('Seleziona data e orario dell’appuntamento.');
+        }
+
+        await _firebaseBackend.createAppointment(
+          service: request['service'] as String,
+          workshopName: request['workshop'] as String,
+          preferredDate: preferredDate,
+          preferredTime: preferredTime,
+          note: request['note'] as String? ?? '',
+        );
+
+        if (!mounted) return;
         setState(() {
           _appuntamenti.insert(0, Appointment(
             id: DateTime.now().microsecondsSinceEpoch.toString(),
             service: request['service'] as String,
             workshopName: request['workshop'] as String,
-            preferredDate: request['preferredDate'] as DateTime,
-            preferredTime: request['preferredTime'] as String,
+            preferredDate: preferredDate,
+            preferredTime: preferredTime,
             status: AppointmentStatus.requested,
-            note: request['note'] as String,
+            note: request['note'] as String? ?? '',
           ));
         });
       },

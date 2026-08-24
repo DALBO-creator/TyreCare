@@ -31,9 +31,15 @@
     },
   };
 
+  const WORKSHOP_ID = 'la-santi-gomme';
   let revenueChart;
   let servicesChart;
   let toast;
+  let firebaseAuth;
+  let firebaseDb;
+  let liveUser;
+  let liveUnsubscribers = [];
+  let liveCounts = { appointments: 0, customers: 0 };
 
   const $ = (selector, parent = document) => parent.querySelector(selector);
   const $$ = (selector, parent = document) => [...parent.querySelectorAll(selector)];
@@ -319,13 +325,13 @@
   }
 
   function setupClientTable() {
-    const rows = $$('#clientsTableBody tr');
+    const getRows = () => $$('#clientsTableBody tr');
     const search = $('#clientSearch');
     let currentFilter = 'all';
 
     const filterRows = () => {
       const query = (search?.value || '').trim().toLowerCase();
-      rows.forEach((row) => {
+      getRows().forEach((row) => {
         const matchesFilter = currentFilter === 'all' || row.dataset.status === currentFilter;
         const matchesSearch = !query || row.textContent.toLowerCase().includes(query);
         row.hidden = !(matchesFilter && matchesSearch);
@@ -340,14 +346,14 @@
     search?.addEventListener('input', filterRows);
 
     $('#selectAllClients')?.addEventListener('change', (event) => {
-      rows.filter((row) => !row.hidden).forEach((row) => {
+      getRows().filter((row) => !row.hidden).forEach((row) => {
         const checkbox = $('.client-check', row);
         if (checkbox) checkbox.checked = event.target.checked;
       });
     });
 
     const exportClients = () => {
-      const visibleRows = rows.filter((row) => !row.hidden);
+      const visibleRows = getRows().filter((row) => !row.hidden);
       const csv = ['Cliente,Email,Veicolo,Targa,Ultimo intervento,Valore cliente,Stato'];
       visibleRows.forEach((row) => {
         const cells = row.cells;
@@ -369,7 +375,7 @@
   function setupAppointmentForm() {
     const form = $('#appointmentForm');
     if (!form) return;
-    form.addEventListener('submit', (event) => {
+    form.addEventListener('submit', async (event) => {
       event.preventDefault();
       const client = $('#appointmentClient').value;
       const date = $('#appointmentDate').value;
@@ -378,6 +384,29 @@
       if (!client || !date || !time || !service) return;
 
       const [year, month, day] = date.split('-').map(Number);
+      try {
+        if (liveUser && firebaseDb) {
+          await firebaseDb.collection('appointments').add({
+            workshopId: WORKSHOP_ID,
+            workshopName: 'La Santi Gomme',
+            customerId: liveUser.uid,
+            customerName: client,
+            customerEmail: liveUser.email || null,
+            service,
+            preferredDate: firebase.firestore.Timestamp.fromDate(new Date(year, month - 1, day)),
+            preferredTime: time,
+            note: $('#appointmentNote').value.trim(),
+            status: 'confirmed',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          });
+        }
+      } catch (error) {
+        console.warn('TyreCare Firebase appointment write failed:', error);
+        showToast('Impossibile salvare l’appuntamento. Riprova.');
+        return;
+      }
+
       const readableDate = new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'long' }).format(new Date(year, month - 1, day));
       const initials = client.split(' ').map((part) => part[0]).join('').slice(0, 2);
       const palette = ['teal-bg', 'violet-bg', 'orange-bg', 'blue-bg'];
@@ -443,6 +472,201 @@
     });
   }
 
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>'\"]/g, (character) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;',
+    }[character]));
+  }
+
+  function updateBackendStatus(user, error = false) {
+    const title = $('#backendStatusTitle');
+    const text = $('#backendStatusText');
+    const button = $('#backendConnectButton');
+    if (!title || !text || !button) return;
+
+    if (user) {
+      title.textContent = 'Dati sincronizzati';
+      text.innerHTML = '<i class="live-dot"></i> Firebase Live';
+      button.innerHTML = '<i class="bi bi-box-arrow-right"></i> Scollega account';
+      button.classList.add('connected');
+    } else {
+      title.textContent = error ? 'Demo locale' : 'Demo locale';
+      text.innerHTML = `<i class="live-dot"></i> ${error ? 'Firebase non disponibile' : 'Dati di presentazione'}`;
+      button.innerHTML = '<i class="bi bi-cloud-arrow-up"></i> Collega dati Firebase';
+      button.classList.remove('connected');
+    }
+  }
+
+  function authErrorMessage(error) {
+    const messages = {
+      'auth/invalid-credential': 'Email o password non corrette.',
+      'auth/user-not-found': 'Nessuna utenza trovata per questa email.',
+      'auth/wrong-password': 'Email o password non corrette.',
+      'auth/too-many-requests': 'Troppi tentativi. Riprova tra poco.',
+      'auth/network-request-failed': 'Connessione non disponibile. Controlla la rete.',
+    };
+    return messages[error?.code] || 'Impossibile collegare l’utenza Firebase.';
+  }
+
+  function statusLabel(status) {
+    const labels = { requested: 'In attesa', confirmed: 'Confermato', completed: 'Completato', cancelled: 'Annullato' };
+    return labels[status] || 'In attesa';
+  }
+
+  function appointmentClass(status) {
+    return status === 'confirmed' || status === 'completed' ? 'confirmed' : 'pending';
+  }
+
+  function snapshotDate(value) {
+    if (!value) return null;
+    if (typeof value.toDate === 'function') return value.toDate();
+    if (value.seconds) return new Date(value.seconds * 1000);
+    return value instanceof Date ? value : new Date(value);
+  }
+
+  function renderLiveAppointments(snapshot) {
+    const list = $('#appointmentList');
+    if (!list || snapshot.empty) return;
+    const documents = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    documents.sort((left, right) => {
+      const leftDate = snapshotDate(left.preferredDate)?.getTime() || 0;
+      const rightDate = snapshotDate(right.preferredDate)?.getTime() || 0;
+      return leftDate - rightDate || String(left.preferredTime || '').localeCompare(String(right.preferredTime || ''));
+    });
+    list.innerHTML = '';
+    documents.slice(0, 8).forEach((appointment, index) => {
+      const date = snapshotDate(appointment.preferredDate);
+      const customer = escapeHtml(appointment.customerName || 'Cliente TyreCare');
+      const service = escapeHtml(appointment.service || 'Servizio da definire');
+      const time = escapeHtml(appointment.preferredTime || '--:--');
+      const status = appointment.status || 'requested';
+      const initials = customer.replace(/[^A-Za-zÀ-ÿ ]/g, '').split(' ').filter(Boolean).map((part) => part[0]).join('').slice(0, 2).toUpperCase() || 'TC';
+      const palette = ['teal-bg', 'violet-bg', 'orange-bg', 'blue-bg'];
+      const item = document.createElement('div');
+      item.className = 'appointment-item';
+      item.innerHTML = `<div class="appointment-time"><strong>${time}</strong><span>${date ? new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'short' }).format(date) : 'Da definire'}</span></div><div class="appointment-avatar ${palette[index % palette.length]}">${escapeHtml(initials)}</div><div class="appointment-info"><strong>${customer}</strong><span><i class="bi bi-car-front"></i> ${service}</span></div><span class="appointment-status ${appointmentClass(status)}">${statusLabel(status)}</span><button class="item-more" aria-label="Opzioni appuntamento"><i class="bi bi-three-dots-vertical"></i></button>`;
+      list.appendChild(item);
+      if (date) appointmentDates.add(dateKey(date));
+    });
+    renderCalendar();
+    const counter = $('.nav-link[data-section="appointments"] .nav-counter');
+    if (counter) counter.textContent = String(documents.length);
+  }
+
+  function renderLiveCustomers(snapshot) {
+    const body = $('#clientsTableBody');
+    if (!body || snapshot.empty) return;
+    body.innerHTML = '';
+    snapshot.docs.slice(0, 20).forEach((snapshotDocument, index) => {
+      const customer = snapshotDocument.data();
+      const name = escapeHtml(customer.displayName || customer.name || 'Cliente TyreCare');
+      const email = escapeHtml(customer.email || 'Email non disponibile');
+      const initials = name.replace(/[^A-Za-zÀ-ÿ ]/g, '').split(' ').filter(Boolean).map((part) => part[0]).join('').slice(0, 2).toUpperCase() || 'TC';
+      const palette = ['teal-bg', 'violet-bg', 'orange-bg', 'blue-bg'];
+      const row = window.document.createElement('tr');
+      row.dataset.status = 'active';
+      row.innerHTML = `<td><input class="form-check-input client-check" type="checkbox" aria-label="Seleziona ${name}"></td><td><div class="table-person"><div class="table-avatar ${palette[index % palette.length]}">${escapeHtml(initials)}</div><div><strong>${name}</strong><span>${email}</span></div></div></td><td>Veicolo da associare</td><td>Profilo TyreCare</td><td class="money-cell">—</td><td><span class="status-pill active">Attivo</span></td><td><button class="row-more" aria-label="Apri cliente ${name}"><i class="bi bi-arrow-up-right"></i></button></td>`;
+      body.appendChild(row);
+    });
+    const counter = $('.nav-link[data-section="clients"] .nav-counter');
+    if (counter) counter.textContent = String(snapshot.size);
+    const tabCount = $('.client-tab[data-filter="all"] span');
+    if (tabCount) tabCount.textContent = String(snapshot.size);
+  }
+
+  function stopLiveData() {
+    liveUnsubscribers.forEach((unsubscribe) => unsubscribe());
+    liveUnsubscribers = [];
+    liveCounts = { appointments: 0, customers: 0 };
+  }
+
+  function updateLiveRecordCount() {
+    const statusText = $('#backendStatusText');
+    if (statusText) statusText.innerHTML = `<i class="live-dot"></i> ${liveCounts.appointments + liveCounts.customers} record sincronizzati`;
+  }
+
+  function loadLiveData() {
+    if (!firebaseDb || !liveUser) return;
+    stopLiveData();
+    const appointmentsQuery = firebaseDb.collection('appointments').where('workshopId', '==', WORKSHOP_ID).limit(50);
+    const customersQuery = firebaseDb.collection('customers').where('workshopId', '==', WORKSHOP_ID).limit(200);
+    const onReadError = (error) => {
+      console.warn('TyreCare Firebase read failed:', error);
+      showToast('Accesso riuscito, ma non è stato possibile leggere i dati dell’officina.');
+    };
+
+    liveUnsubscribers.push(appointmentsQuery.onSnapshot((snapshot) => {
+      liveCounts.appointments = snapshot.size;
+      renderLiveAppointments(snapshot);
+      updateLiveRecordCount();
+    }, onReadError));
+    liveUnsubscribers.push(customersQuery.onSnapshot((snapshot) => {
+      liveCounts.customers = snapshot.size;
+      renderLiveCustomers(snapshot);
+      updateLiveRecordCount();
+    }, onReadError));
+  }
+
+  function setupFirebase() {
+    const config = window.TyreCareFirebaseConfig;
+    if (!config || typeof firebase === 'undefined') {
+      updateBackendStatus(null, true);
+      return;
+    }
+    try {
+      if (!firebase.apps.length) firebase.initializeApp(config);
+      firebaseAuth = firebase.auth();
+      firebaseDb = firebase.firestore();
+      firebaseAuth.onAuthStateChanged((user) => {
+        if (!user) stopLiveData();
+        liveUser = user;
+        updateBackendStatus(user);
+        if (user) loadLiveData();
+      });
+    } catch (error) {
+      console.warn('TyreCare Firebase init failed:', error);
+      updateBackendStatus(null, true);
+    }
+  }
+
+  function setupAuth() {
+    const button = $('#backendConnectButton');
+    const form = $('#authForm');
+    const modalElement = $('#authModal');
+    if (!button || !form || !modalElement) return;
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+
+    button.addEventListener('click', async () => {
+      if (liveUser && firebaseAuth) {
+        await firebaseAuth.signOut();
+        showToast('Account Firebase scollegato.');
+      } else {
+        $('#authError').textContent = '';
+        modal.show();
+      }
+    });
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!firebaseAuth) {
+        $('#authError').textContent = 'Firebase non è disponibile in questa sessione.';
+        return;
+      }
+      const submitButton = $('button[type="submit"]', form);
+      submitButton.disabled = true;
+      $('#authError').textContent = '';
+      try {
+        await firebaseAuth.signInWithEmailAndPassword($('#authEmail').value.trim(), $('#authPassword').value);
+        modal.hide();
+        form.reset();
+        showToast('Dashboard collegata ai dati reali dell’officina.');
+      } catch (error) {
+        $('#authError').textContent = authErrorMessage(error);
+      } finally {
+        submitButton.disabled = false;
+      }
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     setGreeting();
     const dateLabel = $('#currentDateLabel');
@@ -455,5 +679,7 @@
     setupAppointmentForm();
     setupTheme();
     setupUtilities();
+    setupFirebase();
+    setupAuth();
   });
 })();

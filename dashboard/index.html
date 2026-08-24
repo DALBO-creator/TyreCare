@@ -76,10 +76,11 @@
         <div class="sync-card">
           <div class="sync-icon"><i class="bi bi-shield-check"></i></div>
           <div>
-            <strong>Dati sincronizzati</strong>
-            <span><i class="live-dot"></i> Ultimo sync 2 min fa</span>
+            <strong id="backendStatusTitle">Demo locale</strong>
+            <span id="backendStatusText"><i class="live-dot"></i> Dati di presentazione</span>
           </div>
         </div>
+        <button class="backend-connect" id="backendConnectButton"><i class="bi bi-cloud-arrow-up"></i> Collega dati Firebase</button>
         <div class="sidebar-user">
           <div class="user-avatar">AL</div>
           <div class="user-details"><strong>Alessandro L.</strong><span>Amministratore</span></div>
@@ -226,6 +227,13 @@
     </main>
   </div>
 
+  <div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+      <div class="modal-header"><div><p class="panel-kicker">Accesso officina</p><h2 class="modal-title" id="authModalLabel">Collega i dati reali</h2></div><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button></div>
+      <form id="authForm"><div class="modal-body"><p class="auth-intro">Accedi con l’utenza dell’officina per leggere appuntamenti e clienti sincronizzati con l’app TyreCare.</p><div class="mb-3"><label class="form-label" for="authEmail">Email officina</label><input class="form-control" type="email" id="authEmail" autocomplete="email" placeholder="officina@esempio.it" required></div><div><label class="form-label" for="authPassword">Password</label><input class="form-control" type="password" id="authPassword" autocomplete="current-password" placeholder="••••••••" required></div><p class="auth-error" id="authError" role="alert"></p></div><div class="modal-footer"><button type="button" class="btn btn-outline-soft rounded-pill" data-bs-dismiss="modal">Annulla</button><button type="submit" class="btn btn-primary rounded-pill"><i class="bi bi-box-arrow-in-right"></i> Accedi</button></div></form>
+    </div></div>
+  </div>
+
   <div class="modal fade" id="appointmentModal" tabindex="-1" aria-labelledby="appointmentModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
       <div class="modal-header"><div><p class="panel-kicker">Agenda officina</p><h2 class="modal-title" id="appointmentModalLabel">Nuovo appuntamento</h2></div><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button></div>
@@ -237,6 +245,10 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
